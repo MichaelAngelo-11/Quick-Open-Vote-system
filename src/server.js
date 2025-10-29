@@ -2,6 +2,9 @@
 const express = require("express");
 const cors = require("cors");
 const authRoutes = require("./routes/auth");
+const electionsRoutes = require("./routes/elections");
+const votesRoutes = require("./routes/votes");
+const adminRoutes = require("./routes/admin");
 const getDBConnection = require("./db");
 
 const app = express();
@@ -23,6 +26,17 @@ app.get("/test-db", (req, res) => {
 
 // Auth routes
 app.use("/auth", authRoutes);
+
+// Elections routes
+app.use("/elections", electionsRoutes);
+
+// Votes routes
+app.use("/votes", votesRoutes);
+
+// Admin routes
+app.use("/admin", adminRoutes);
+
+// Start the server
 
 const PORT = 5000;
 app.listen(PORT, () => {
