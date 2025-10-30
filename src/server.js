@@ -4,7 +4,6 @@ const cors = require("cors");
 const authRoutes = require("./routes/auth");
 const electionsRoutes = require("./routes/elections");
 const votesRoutes = require("./routes/votes");
-const adminRoutes = require("./routes/admin");
 const getDBConnection = require("./db");
 
 const app = express();
