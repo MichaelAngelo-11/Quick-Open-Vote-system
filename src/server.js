@@ -32,8 +32,6 @@ app.use("/elections", electionsRoutes);
 // Votes routes
 app.use("/votes", votesRoutes);
 
-// Admin routes
-app.use("/admin", adminRoutes);
 
 // Start the server
 
