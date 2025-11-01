@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0052cc 0%, #003d99 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            padding: 20px;
+        }
+        #container {
+            width: 100%;
+            max-width: 420px;
+        }
+        #loginCard {
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+            padding: 40px 32px;
+        }
+        #header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        #header h1 {
+            font-size: 2.2rem;
+            color: #0052cc;
+            margin: 0 0 8px 0;
+            font-weight: 600;
+        }
+        #header p {
+            font-size: 1.1rem;
+            color: #555;
+            margin: 0;
+        }
+        label {
+            display: block;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 6px;
+            font-size: 0.95rem;
+        }
+        input {
+            width: 100%;
+            padding: 12px 14px;
+            margin-bottom: 18px;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: all 0.2s ease;
+        }
+        input:focus {
+            outline: none;
+            border-color: #0052cc;
+            box-shadow: 0 0 0 3px rgba(0,82,204,0.1);
+        }
+        button {
+            width: 100%;
+            padding: 14px 20px;
+            border-radius: 6px;
+            border: none;
+            background: #0052cc;
+            color: #fff;
+            font-size: 1.05rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        button:hover {
+            background: #003d99;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,82,204,0.3);
+        }
+        button:active {
+            transform: translateY(0);
+        }
+        #errorAlert {
+            display: none;
+            background: #f8d7da;
+            border-left: 4px solid #dc3545;
+            color: #721c24;
+            padding: 14px 16px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            font-weight: 500;
+        }
+        #successAlert {
+            display: none;
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            color: #155724;
+            padding: 14px 16px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            font-weight: 500;
+        }
+        #footer {
+            text-align: center;
+            margin-top: 24px;
+            font-size: 0.9rem;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <div id="loginCard">
+            <div id="header">
+                <h1>Voting System</h1>
+                <p>Admin Login</p>
+            </div>
+            <div id="errorAlert"><span id="errorMessage"></span></div>
+            <div id="successAlert"><span id="successMessage"></span></div>
+            <form id="loginForm">
+                <label for="username">Username</label>
+                <input type="text" id="username" placeholder="Enter your username" required>
+                <label for="password">Password</label>
+                <input type="password" id="password" placeholder="Enter your password" required>
+                <button type="submit" id="loginButton"><span id="buttonText">Login</span></button>
+            </form>
+            <div id="footer">
+                <p>Only for admin use</p>
+            </div>
+        </div>
+    </div>
+    <script>
+        // Login logic
+        const loginForm = document.getElementById('loginForm');
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+        const errorAlert = document.getElementById('errorAlert');
+        const errorMessage = document.getElementById('errorMessage');
+        const successAlert = document.getElementById('successAlert');
+        const successMessage = document.getElementById('successMessage');
+        const buttonText = document.getElementById('buttonText');
+        // Handle form submission
+        loginForm.onsubmit = async function(e) {
+            e.preventDefault();
+            errorAlert.style.display = 'none';
+            successAlert.style.display = 'none';
+            buttonText.textContent = 'Logging in...';
+            const username = usernameInput.value.trim();
+            const password = passwordInput.value;
+            // If username or password is empty return error
+            if (!username || !password) {
+                errorMessage.textContent = 'Please enter both username and password.';
+                errorAlert.style.display = 'block';
+                buttonText.textContent = 'Login';
+                return;
+            }
+            // Call the login API from the server.js
+            // Implement try-catch block for network errors
+            try {
+                const res = await fetch('http://localhost:5000/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                const data = await res.json();
+                if (!res.ok) {
+                    errorMessage.textContent = data.message || 'Login failed';
+                    errorAlert.style.display = 'block';
+                    buttonText.textContent = 'Login';
+                    return;
+                }
+                if (data.role_id !== 2) {
+                    errorMessage.textContent = 'Access denied. Only admin accounts can login.';
+                    errorAlert.style.display = 'block';
+                    buttonText.textContent = 'Login';
+                    return;
+                }
+                localStorage.setItem('user', JSON.stringify(data));
+                successMessage.textContent = 'Login successful! Redirecting...';
+                successAlert.style.display = 'block';
+                // Redirect to admin dashboard after successful login
+                setTimeout(() => {
+                    window.location.href = 'admin-dashboard.html';
+                }, 1000);
+                //Prompt try again
+            } catch (err) {
+                errorMessage.textContent = 'Network error. Please try again.';
+                errorAlert.style.display = 'block';
+            } finally {
+                buttonText.textContent = 'Login';
+            }
+        };
+    </script>
+</body>
+</html>
