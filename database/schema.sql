@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS users (
   national_id TEXT NOT NULL UNIQUE,
   role_id INTEGER NOT NULL,
   email TEXT NOT NULL UNIQUE,
-  time_registered TEXT NOT NULL,
+  time_registered TEXT NOT NULL DEFAULT (datetime('now')),
   FOREIGN KEY (role_id) REFERENCES roles(role_id)
 );
 

@@ -2,18 +2,19 @@ const getDBConnection = require("../db");
 
 // Register User
 function registerUser(req, res) {
-  const { username, password, fullname, national_id, role_id, email, time_registered } = req.body;
+  const { username, password, fullname, national_id, role_id, email } = req.body;
   const db = getDBConnection();
 
+  // time_registered will be automatically set by the database DEFAULT value
   db.run(
-    `INSERT INTO users (username, password, fullname, national_id, role_id, email, time_registered)
-     VALUES (?, ?, ?, ?, ?, ?, ?)`,
-    [username, password, fullname, national_id, role_id, email, time_registered],
+    `INSERT INTO users (username, password, fullname, national_id, role_id, email)
+     VALUES (?, ?, ?, ?, ?, ?)`,
+    [username, password, fullname, national_id, role_id, email],
     function(err) {
       if (err) {
         return res.status(500).json({ message: "❌ Error registering user", error: err.message });
       }
-      res.json({ message: "✅ User registered successfully!" });
+      res.json({ message: "✅ User registered successfully!", user_id: this.lastID });
     }
   );
 }
