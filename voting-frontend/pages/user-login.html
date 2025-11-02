@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Login - Voting System</title>
+    <link rel="stylesheet" href="user-login.css">
+</head>
+
+<body>
+    <div id="container">
+        <div id="loginCard">
+            <div id="header">
+                <h1>Voting System</h1>
+                <p>User Login</p>
+            </div>
+
+            <div id="errorAlert"><span id="errorMessage"></span></div>
+            <div id="successAlert"><span id="successMessage"></span></div>
+
+            <form id="loginForm">
+                <label for="username">Username</label>
+                <input type="text" id="username" placeholder="Enter your username" required>
+
+                <label for="password">Password</label>
+                <input type="password" id="password" placeholder="Enter your password" required>
+
+                <button type="submit" id="loginButton"><span id="buttonText">Login</span></button>
+            </form>
+
+            <div id="footer">
+                <p>For registered voters only</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const loginForm = document.getElementById('loginForm');
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+        const errorAlert = document.getElementById('errorAlert');
+        const successAlert = document.getElementById('successAlert');
+        const errorMessage = document.getElementById('errorMessage');
+        const successMessage = document.getElementById('successMessage');
+        const buttonText = document.getElementById('buttonText');
+
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            errorAlert.style.display = 'none';
+            successAlert.style.display = 'none';
+            buttonText.textContent = 'Logging in...';
+
+            const username = usernameInput.value.trim();
+            const password = passwordInput.value;
+
+            if (!username || !password) {
+                errorMessage.textContent = 'Please enter both username and password.';
+                errorAlert.style.display = 'block';
+                buttonText.textContent = 'Login';
+                return;
+            }
+
+            try {
+                const res = await fetch('http://localhost:5000/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const data = await res.json();
+                if (!res.ok) {
+                    errorMessage.textContent = data.message || 'Login failed';
+                    errorAlert.style.display = 'block';
+                    buttonText.textContent = 'Login';
+                    return;
+                }
+
+                // Ensure only normal users (role_id = 1) can access this page
+                if (data.role_id !== 1) {
+                    errorMessage.textContent = 'Access denied. Only user accounts can login.';
+                    errorAlert.style.display = 'block';
+                    buttonText.textContent = 'Login';
+                    return;
+                }
+
+                localStorage.setItem('user', JSON.stringify(data));
+
+                successMessage.textContent = 'Login successful! Redirecting...';
+                successAlert.style.display = 'block';
+
+                setTimeout(() => {
+                    window.location.href = 'user-dashboard.html';
+                }, 1000);
+            } catch (err) {
+                errorMessage.textContent = 'Network error. Please try again.';
+                errorAlert.style.display = 'block';
+            } finally {
+                buttonText.textContent = 'Login';
+            }
+        });
+    </script>
+</body>
+
+</html>
