@@ -39,7 +39,11 @@ body {
     color: #cce5ff;
     text-align: center;
 }
-nav { display: flex; flex-direction: column; }
+nav { 
+    display: flex; 
+    flex-direction: column;
+    flex: 1;
+}
 .nav-item {
     padding: 16px 24px;
     cursor: pointer;
@@ -60,6 +64,16 @@ nav { display: flex; flex-direction: column; }
 .nav-item:hover {
     background: rgba(0, 82, 204, 0.5);
     padding-left: 28px;
+}
+/* Push settings and logout to bottom */
+.nav-item[data-section="settings"] {
+    margin-top: auto;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 20px;
+}
+.nav-item[data-section="logout"] {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 20px;
 }
 #main-content {
     margin-left: 240px;
