@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Admin Dashboard</title>
+    <link href="../css/admin-dashboard.css" rel="stylesheet">
+</head>
+<body>
+<div id="layout">
+    <div id="sidebar">
+        <div id="logo"><h2>Admin Panel</h2></div>
+        <div id="welcomeMsg"></div>
+        <nav id="nav"></nav>
+    </div>
+    <div id="main-content">
+        <div class="alert alert-success" id="successAlert"></div>
+        <div class="alert alert-error" id="errorAlert"></div>
+        <div id="sections"></div>
+    </div>
+</div>
+<div class="modal-bg" id="modalBg" onclick="modal.close()"></div>
+<div class="modal" id="crudModal"></div>
+<script>
+    // Config
+    const config = {
+        apiBase: 'http://localhost:5000',
+        alertDuration: 4000,
+        sections: [
+            {id: 'results', title: 'Election Results & Votes', hasAdd: false, hasImport: false},
+            {id: 'elections', title: 'Manage Elections', hasAdd: true, hasImport: false},
+            {id: 'candidates', title: 'Manage Candidates', hasAdd: true, hasImport: true},
+            {id: 'users', title: 'Manage Users', hasAdd: true, hasImport: true},
+            {id: 'settings', title: 'Personal Settings', hasAdd: false, hasImport: false},
+            {id: 'logout', title: 'Logout', hasAdd: false, hasImport: false}
+        ]
+    };
+
+    // App state and mock data
+    const app = {
+        user: JSON.parse(localStorage.getItem('user') || '{}'),
+        activeSection: 'results',
+        data: {
+            candidates: [
+                {
+                    id: 1, fullname: 'Uwase Diane', election: 'ALU Student Council President',
+                    bio: 'Third-year Software Engineering student passionate about innovation',
+                    photo: 'https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=400'
+                },
+                {
+                    id: 2, fullname: 'Mugisha Patrick', election: 'ALU Student Council President',
+                    bio: 'Entrepreneurship major with student leadership experience',
+                    photo: 'https://images.unsplash.com/photo-1570158268183-d296b2892211?w=400'
+                },
+                {
+                    id: 3, fullname: 'Niyonzima Grace', election: 'ALU Student Council Vice President',
+                    bio: 'Global Challenges student advocating for sustainability',
+                    photo: 'https://images.unsplash.com/photo-1632765854612-9b02b6ec2b15?w=400'
+                }
+            ],
+            elections: [
+                {
+                    id: 1, title: 'ALU Student Council President',
+                    description: 'African Leadership University 2025-2026 Presidential Election',
+                    status: 'Upcoming', start: '2025-11-15', end: '2025-11-17'
+                },
+                {
+                    id: 2, title: 'ALU Student Council Vice President',
+                    description: 'African Leadership University 2025-2026 Vice Presidential Election',
+                    status: 'Upcoming', start: '2025-11-15', end: '2025-11-17'
+                }
+            ],
+            users: [
+                {
+                    id: 1, fullname: 'Kayitesi Alice', username: 'admin', national_id: '1199780012345',
+                    role: 'admin', email: 'alice.kayitesi@alueducation.com', time_registered: '2025-10-28T09:00:00Z'
+                },
+                {
+                    id: 2, fullname: 'Nkusi Emmanuel', username: 'nkusie', national_id: '1200390087654',
+                    role: 'voter', email: 'emmanuel.nkusi@alustudent.com', time_registered: '2025-10-29T14:30:00Z'
+                },
+                {
+                    id: 3, fullname: 'Umutoni Sarah', username: 'umutonis', national_id: '1200190056789',
+                    role: 'voter', email: 'sarah.umutoni@alustudent.com', time_registered: '2025-10-30T10:15:00Z'
+                }
+            ]
+        }
+    };
+
+    // Helper functions
+    const helpers = {
+        showAlert(msg, type = 'success') {
+            const alerts = {success: 'successAlert', error: 'errorAlert'};
+            Object.values(alerts).forEach(id => document.getElementById(id).classList.remove('show'));
+            const alert = document.getElementById(alerts[type]);
+            alert.textContent = msg;
+            alert.classList.add('show');
+            setTimeout(() => alert.classList.remove('show'), config.alertDuration);
+        },
+
+        async readFileAsBase64(file) {
+            return new Promise(resolve => {
+                const reader = new FileReader();
+                reader.onload = e => resolve(e.target.result);
+                reader.readAsDataURL(file);
+            });
+        },
+
+        formatDate(date) {
+            return new Date(date).toLocaleString();
+        },
+
+        $: (id) => document.getElementById(id),
+        $$: (selector) => document.querySelectorAll(selector)
+    };
+
+    // Modal handlers
+    const modal = {
+        show(html, onSubmit) {
+            helpers.$('crudModal').innerHTML = html;
+            helpers.$('modalBg').style.display = 'flex';
+            helpers.$('crudModal').style.display = 'block';
+            const form = helpers.$('crudForm');
+            if (form) {
+                form.onsubmit = async (e) => {
+                    e.preventDefault();
+                    await onSubmit(new FormData(form));
+                    this.close();
+                };
+            }
+            const closeBtn = helpers.$('closeModalBtn');
+            if (closeBtn) closeBtn.onclick = () => this.close();
+        },
+
+        close() {
+            helpers.$('crudModal').style.display = 'none';
+            helpers.$('modalBg').style.display = 'none';
+        },
+
+        setupPhotoPreview() {
+            setTimeout(() => {
+                const fileInput = helpers.$('photoFile');
+                const preview = helpers.$('photoPreview');
+                if (fileInput && preview) {
+                    fileInput.onchange = async (e) => {
+                        if (e.target.files[0]) {
+                            const base64 = await helpers.readFileAsBase64(e.target.files[0]);
+                            preview.innerHTML = `<img src="${base64}" style="max-width:150px;border-radius:4px;border:2px solid #28a745;">`;
+                        }
+                    };
+                }
+            }, 50);
+        }
+    };
+
+    // Render functions for tables
+    const render = {
+        table(headers, rows, actions) {
+            const thead = `<thead><tr>${headers.map(h => `<th>${h}</th>`).join('')}<th>Actions</th></tr></thead>`;
+            const tbody = `<tbody>${rows.map((row, i) => `<tr>${row}${actions[i]}</tr>`).join('')}</tbody>`;
+            return `<table>${thead}${tbody}</table>`;
+        },
+
+        candidates() {
+            const section = helpers.$('sections').querySelector('[data-section="candidates"]');
+            if (!section) return;
+
+            const rows = app.data.candidates.map(c => `
+            <td>${c.fullname}</td>
+            <td>${c.election}</td>
+            <td>${c.bio || ''}</td>
+            <td>${c.photo ? `<img src="${c.photo}" style="max-width:60px;height:60px;border-radius:4px;object-fit:cover;">` : ''}</td>
+        `);
+
+            const actions = app.data.candidates.map(c => `<td>
+            <button class="btn-secondary" onclick="crud.editCandidate(${c.id})">Edit</button>
+            <button class="btn-secondary" onclick="crud.deleteCandidate(${c.id})">Delete</button>
+        </td>`);
+
+            section.querySelector('.card').innerHTML = this.table(
+                ['Full Name', 'Election', 'Bio', 'Photo'], rows, actions
+            );
+        },
+
+        elections() {
+            const section = helpers.$('sections').querySelector('[data-section="elections"]');
+            if (!section) return;
+
+            const rows = app.data.elections.map(e => `
+            <td>${e.title}</td>
+            <td>${e.description || ''}</td>
+            <td>${e.status}</td>
+            <td>${e.start}</td>
+            <td>${e.end}</td>
+        `);
+
+            const actions = app.data.elections.map(e => `<td>
+            <button class="btn-secondary" onclick="crud.editElection(${e.id})">Edit</button>
+            <button class="btn-secondary" onclick="crud.deleteElection(${e.id})">Delete</button>
+        </td>`);
+
+            section.querySelector('.card').innerHTML = this.table(
+                ['Title', 'Description', 'Status', 'Start', 'End'], rows, actions
+            );
+        },
+
+        users() {
+            const section = helpers.$('sections').querySelector('[data-section="users"]');
+            if (!section) return;
+
+            const rows = app.data.users.map(u => `
+            <td>${u.fullname}</td>
+            <td>${u.username}</td>
+            <td>${u.national_id}</td>
+            <td>${u.role}</td>
+            <td>${u.email}</td>
+            <td>${helpers.formatDate(u.time_registered)}</td>
+        `);
+
+            const actions = app.data.users.map(u => `<td>
+            <button class="btn-secondary" onclick="crud.editUser(${u.id})">Edit</button>
+            <button class="btn-secondary" onclick="crud.deleteUser(${u.id})">Delete</button>
+        </td>`);
+
+            section.querySelector('.card').innerHTML = this.table(
+                ['Full Name', 'Username', 'National ID', 'Role', 'Email', 'Time Registered'], rows, actions
+            );
+        },
+
+        results() {
+            const section = helpers.$('sections').querySelector('[data-section="results"]');
+            if (!section) return;
+
+            section.querySelector('.card').innerHTML = `
+            <div style="text-align:center;padding:40px;color:#666;">
+                <h3 style="margin:0 0 10px 0;">No votes recorded yet</h3>
+                <p style="margin:0;">Votes will appear here once users start voting.</p>
+            </div>`;
+        },
+
+        settings() {
+            const section = helpers.$('sections').querySelector('[data-section="settings"]');
+            if (!section) return;
+
+            section.querySelector('.card').innerHTML = `
+            <form id="settingsForm">
+                <div class="form-group"><label>Full Name</label><input id="settingsFullname" required type="text"></div>
+                <div class="form-group"><label>Username</label><input id="settingsUsername" required type="text"></div>
+                <div class="form-group"><label>Email</label><input id="settingsEmail" required type="email"></div>
+                <div class="form-group"><label>National ID</label><input id="settingsNationalId" required type="text"></div>
+                <div class="form-group"><label>Current Password (required)</label><input id="settingsCurrentPassword" required type="password"></div>
+                <div class="form-group"><label>New Password (optional)</label><input id="settingsPassword" type="password"></div>
+                <button class="btn-success" type="submit">Save Changes</button>
+            </form>`;
+
+            settings.load();
+            helpers.$('settingsForm').onsubmit = settings.save;
+        }
+    };
+
+    // CRUD operations
+    const crud = {
+        // Candidates
+        async addCandidate() {
+            const electionOpts = app.data.elections.map(e => `<option value="${e.title}">${e.title}</option>`).join('');
+            modal.show(`
+            <form id="crudForm"><h3>Add Candidate</h3>
+                <input name="fullname" required placeholder="Full Name"><br><br>
+                <select name="election" required><option value="">Select Election</option>${electionOpts}</select><br><br>
+                <input name="bio" placeholder="Bio"><br><br>
+                <label>Photo:</label>
+                <input type="file" id="photoFile" accept="image/*"><br>
+                <div id="photoPreview"></div>
+                <small>Or URL:</small><input name="photo" id="photoUrl" placeholder="https://..."><br><br>
+                <button type="submit">Add</button>
+                <button type="button" id="closeModalBtn">Cancel</button>
+            </form>`, async (form) => {
+                const photoFile = helpers.$('photoFile').files[0];
+                const photo = photoFile ? await helpers.readFileAsBase64(photoFile) : form.get('photo');
+                app.data.candidates.push({
+                    id: Date.now(),
+                    fullname: form.get('fullname'),
+                    election: form.get('election'),
+                    bio: form.get('bio'),
+                    photo
+                });
+                render.candidates();
+                helpers.showAlert('Candidate added successfully!');
+            });
+            modal.setupPhotoPreview();
+        },
+
+        async editCandidate(id) {
+            const c = app.data.candidates.find(x => x.id === id);
+            const electionOpts = app.data.elections.map(e =>
+                `<option value="${e.title}"${c.election === e.title ? ' selected' : ''}>${e.title}</option>`).join('');
+            modal.show(`
+            <form id="crudForm"><h3>Edit Candidate</h3>
+                <input name="fullname" value="${c.fullname}" required><br><br>
+                <select name="election" required>${electionOpts}</select><br><br>
+                <input name="bio" value="${c.bio || ''}"><br><br>
+                <label>Change Photo:</label>
+                <input type="file" id="photoFile" accept="image/*"><br>
+                <div id="photoPreview"></div>
+                <input name="photo" id="photoUrl" value="${c.photo || ''}" placeholder="https://..."><br><br>
+                <button type="submit">Save</button>
+                <button type="button" id="closeModalBtn">Cancel</button>
+            </form>`, async (form) => {
+                const photoFile = helpers.$('photoFile').files[0];
+                c.fullname = form.get('fullname');
+                c.election = form.get('election');
+                c.bio = form.get('bio');
+                c.photo = photoFile ? await helpers.readFileAsBase64(photoFile) : form.get('photo');
+                render.candidates();
+                helpers.showAlert('Candidate updated successfully!');
+            });
+            modal.setupPhotoPreview();
+        },
+
+        deleteCandidate(id) {
+            if (!confirm('Delete this candidate?')) return;
+            app.data.candidates = app.data.candidates.filter(x => x.id !== id);
+            render.candidates();
+            helpers.showAlert('Candidate deleted successfully!');
+        },
+
+        // Elections
+        addElection() {
+            modal.show(`
+            <form id="crudForm"><h3>Add Election</h3>
+                <input name="title" required placeholder="Title"><br><br>
+                <input name="description" placeholder="Description"><br><br>
+                <input name="status" required placeholder="Status"><br><br>
+                <input name="start" type="date" required><br><br>
+                <input name="end" type="date" required><br><br>
+                <button type="submit">Add</button>
+                <button type="button" id="closeModalBtn">Cancel</button>
+            </form>`, (form) => {
+                app.data.elections.push({
+                    id: Date.now(),
+                    title: form.get('title'),
+                    description: form.get('description'),
+                    status: form.get('status'),
+                    start: form.get('start'),
+                    end: form.get('end')
+                });
+                render.elections();
+                helpers.showAlert('Election added successfully!');
+            });
+        },
+
+        editElection(id) {
+            const e = app.data.elections.find(x => x.id === id);
+            modal.show(`
+            <form id="crudForm"><h3>Edit Election</h3>
+                <input name="title" value="${e.title}" required><br><br>
+                <input name="description" value="${e.description || ''}"><br><br>
+                <input name="status" value="${e.status}" required><br><br>
+                <input name="start" type="date" value="${e.start}" required><br><br>
+                <input name="end" type="date" value="${e.end}" required><br><br>
+                <button type="submit">Save</button>
+                <button type="button" id="closeModalBtn">Cancel</button>
+            </form>`, (form) => {
+                e.title = form.get('title');
+                e.description = form.get('description');
+                e.status = form.get('status');
+                e.start = form.get('start');
+                e.end = form.get('end');
+                render.elections();
+                helpers.showAlert('Election updated successfully!');
+            });
+        },
+
+        deleteElection(id) {
+            if (!confirm('Delete this election?')) return;
+            app.data.elections = app.data.elections.filter(x => x.id !== id);
+            render.elections();
+            helpers.showAlert('Election deleted successfully!');
+        },
+
+        // Users
+        addUser() {
+            modal.show(`
+            <form id="crudForm"><h3>Add User</h3>
+                <input name="fullname" required placeholder="Full Name"><br><br>
+                <input name="username" required placeholder="Username"><br><br>
+                <input name="national_id" required placeholder="National ID"><br><br>
+                <select name="role" required><option value="">Role</option><option value="admin">Admin</option><option value="voter">Voter</option></select><br><br>
+                <input name="email" required placeholder="Email"><br><br>
+                <label style="color:#999;">Time Registered</label>
+                <input name="time_registered" value="${new Date().toISOString()}" readonly style="background:#f5f5f5;color:#999;"><br><br>
+                <button type="submit">Add</button>
+                <button type="button" id="closeModalBtn">Cancel</button>
+            </form>`, (form) => {
+                app.data.users.push({
+                    id: Date.now(),
+                    fullname: form.get('fullname'),
+                    username: form.get('username'),
+                    national_id: form.get('national_id'),
+                    role: form.get('role'),
+                    email: form.get('email'),
+                    time_registered: form.get('time_registered')
+                });
+                render.users();
+                helpers.showAlert('User added successfully!');
+            });
+        },
+
+        editUser(id) {
+            const u = app.data.users.find(x => x.id === id);
+            modal.show(`
+            <form id="crudForm"><h3>Edit User</h3>
+                <input name="fullname" value="${u.fullname}" required><br><br>
+                <input name="username" value="${u.username}" required><br><br>
+                <input name="national_id" value="${u.national_id}" required><br><br>
+                <select name="role" required><option value="admin"${u.role === 'admin' ? ' selected' : ''}>Admin</option><option value="voter"${u.role === 'voter' ? ' selected' : ''}>Voter</option></select><br><br>
+                <input name="email" value="${u.email}" required><br><br>
+                <label style="color:#999;">Time Registered</label>
+                <input value="${u.time_registered}" readonly style="background:#f5f5f5;color:#999;"><br><br>
+                <button type="submit">Save</button>
+                <button type="button" id="closeModalBtn">Cancel</button>
+            </form>`, (form) => {
+                u.fullname = form.get('fullname');
+                u.username = form.get('username');
+                u.national_id = form.get('national_id');
+                u.role = form.get('role');
+                u.email = form.get('email');
+                render.users();
+                helpers.showAlert('User updated successfully!');
+            });
+        },
+
+        deleteUser(id) {
+            if (!confirm('Delete this user?')) return;
+            app.data.users = app.data.users.filter(x => x.id !== id);
+            render.users();
+            helpers.showAlert('User deleted successfully!');
+        }
+    };
+
+    // Settings with database integration
+    const settings = {
+        async load() {
+            try {
+                const response = await fetch(`${config.apiBase}/auth/users`);
+                if (response.ok) {
+                    const users = await response.json();
+                    const user = users.find(u => u.user_id === app.user.user_id);
+                    if (user) {
+                        helpers.$('settingsFullname').value = user.fullname || '';
+                        helpers.$('settingsUsername').value = user.username || '';
+                        helpers.$('settingsEmail').value = user.email || '';
+                        helpers.$('settingsNationalId').value = user.national_id || '';
+                        return;
+                    }
+                }
+                // Fallback to localStorage
+                helpers.$('settingsFullname').value = app.user.fullname || '';
+                helpers.$('settingsUsername').value = app.user.username || '';
+                helpers.$('settingsEmail').value = app.user.email || '';
+                helpers.$('settingsNationalId').value = app.user.national_id || '';
+            } catch (error) {
+                console.error('Error loading settings:', error);
+            }
+        },
+
+        async save(e) {
+            e.preventDefault();
+            const currentPassword = helpers.$('settingsCurrentPassword').value;
+            if (!currentPassword.trim()) {
+                helpers.showAlert('Please enter your current password', 'error');
+                return;
+            }
+
+            const updateData = {
+                fullname: helpers.$('settingsFullname').value,
+                username: helpers.$('settingsUsername').value,
+                email: helpers.$('settingsEmail').value,
+                national_id: helpers.$('settingsNationalId').value,
+                currentPassword
+            };
+
+            const newPassword = helpers.$('settingsPassword').value;
+            if (newPassword.trim()) updateData.password = newPassword;
+
+            try {
+                const response = await fetch(`${config.apiBase}/auth/update/${app.user.user_id}`, {
+                    method: 'PUT',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(updateData)
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    app.user.fullname = updateData.fullname;
+                    app.user.username = updateData.username;
+                    app.user.email = updateData.email;
+                    app.user.national_id = updateData.national_id;
+                    localStorage.setItem('user', JSON.stringify(app.user));
+                    helpers.$('welcomeMsg').textContent = `Welcome, ${updateData.fullname}!`;
+                    helpers.$('settingsCurrentPassword').value = '';
+                    helpers.$('settingsPassword').value = '';
+                    helpers.showAlert('Settings saved successfully!');
+                } else {
+                    helpers.showAlert(result.message || 'Failed to update settings', 'error');
+                }
+            } catch (error) {
+                helpers.showAlert('Network error. Could not save settings.', 'error');
+            }
+        }
+    };
+
+    // Navigation setup
+    const navigation = {
+        init() {
+            // Create nav items
+            const navHtml = config.sections.map(s =>
+                `<div class="nav-item${s.id === 'results' ? ' active' : ''}" data-section="${s.id}">${s.title}</div>`
+            ).join('');
+            helpers.$('nav').innerHTML = navHtml;
+
+            // Create sections
+            const sectionsHtml = config.sections.filter(s => s.id !== 'logout').map(s => `
+            <div class="section${s.id === 'results' ? ' active' : ''}" data-section="${s.id}">
+                <div class="section-header">
+                    <h2>${s.title}</h2>
+                    <div>
+                        ${s.hasAdd ? `<button class="btn-primary" onclick="crud.add${s.id.charAt(0).toUpperCase() + s.id.slice(1, -1)}()">+ Add ${s.id.slice(0, -1)}</button>` : ''}
+                        ${s.hasImport ? `<button class="btn-secondary" onclick="importData('${s.id}')">Import Data</button>` : ''}
+                    </div>
+                </div>
+                <div class="card"></div>
+            </div>
+        `).join('');
+            helpers.$('sections').innerHTML = sectionsHtml;
+
+            // Setup click handlers
+            helpers.$$('.nav-item').forEach(item => {
+                item.onclick = () => {
+                    const section = item.dataset.section;
+                    if (section === 'logout') {
+                        localStorage.removeItem('user');
+                        window.location.href = 'admin-login.html';
+                        return;
+                    }
+
+                    helpers.$$('.nav-item').forEach(i => i.classList.remove('active'));
+                    item.classList.add('active');
+                    helpers.$$('.section').forEach(s => s.classList.remove('active'));
+                    helpers.$('sections').querySelector(`[data-section="${section}"]`).classList.add('active');
+
+                    app.activeSection = section;
+                    if (render[section]) render[section]();
+                };
+            });
+        }
+    };
+
+    // Import data (coming soon)
+    function importData(type) {
+        alert(`Import ${type} data functionality coming soon!\nSupported formats: JSON, CSV`);
+    }
+
+    // Initialize app
+    function init() {
+        navigation.init();
+        render.results();
+        render.candidates();
+        render.elections();
+        render.users();
+        helpers.$('welcomeMsg').textContent = app.user.fullname ?
+            `Welcome, ${app.user.fullname}!` : '';
+    }
+
+    // Start the app
+    init();
+</script>
+</body>
+</html>
