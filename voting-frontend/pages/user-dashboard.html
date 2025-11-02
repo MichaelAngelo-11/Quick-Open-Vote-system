@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard - Voting System</title>
+    <link rel="stylesheet" href="user-dashboard.css">
+</head>
+<body>
+    <div id="container">
+        <h1>Welcome to the Voting System</h1>
+
+        <div id="alert"></div>
+
+        <!-- Voting Section -->
+        <div class="section" id="voteSection">
+            <h2>Cast Your Vote</h2>
+            <label for="candidateSelect">Select a Candidate:</label>
+            <select id="candidateSelect">
+                <option value="">-- Choose a candidate --</option>
+            </select>
+            <button id="voteBtn">Submit Vote</button>
+        </div>
+
+        <!-- Results Section -->
+        <div class="section" id="resultsSection">
+            <h2>Live Voting Results</h2>
+            <table id="resultsTable">
+                <thead>
+                    <tr>
+                        <th>Candidate</th>
+                        <th>Votes</th>
+                    </tr>
+                </thead>
+                <tbody id="resultsBody">
+                    <tr><td colspan="2" style="text-align:center;">Loading results...</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <button id="logoutBtn">Logout</button>
+    </div>
+
+    <script>
+        const candidateSelect = document.getElementById('candidateSelect');
+        const resultsBody = document.getElementById('resultsBody');
+        const alertBox = document.getElementById('alert');
+
+        // Check user session
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (!user) {
+            window.location.href = 'user-login.html';
+        }
+
+        // Alert message
+        function showAlert(type, message) {
+            alertBox.className = type === 'success' ? 'success' : 'error';
+            alertBox.textContent = message;
+            alertBox.style.display = 'block';
+            setTimeout(() => alertBox.style.display = 'none', 3000);
+        }
+
+        // Load candidates
+        async function loadCandidates() {
+            try {
+                const res = await fetch('http://localhost:5000/candidates');
+                const data = await res.json();
+                candidateSelect.innerHTML = '<option value="">-- Choose a candidate --</option>';
+                data.forEach(c => {
+                    const opt = document.createElement('option');
+                    opt.value = c.id;
+                    opt.textContent = c.name;
+                    candidateSelect.appendChild(opt);
+                });
+            } catch (err) {
+                showAlert('error', 'Error loading candidates.');
+            }
+        }
+
+        // Submit vote
+        document.getElementById('voteBtn').addEventListener('click', async () => {
+            const candidateId = candidateSelect.value;
+            if (!candidateId) {
+                showAlert('error', 'Please select a candidate.');
+                return;
+            }
+            try {
+                const res = await fetch('http://localhost:5000/votes', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: user.id, candidate_id: candidateId })
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.message || 'Vote failed');
+                showAlert('success', 'Vote submitted successfully!');
+                loadResults();
+            } catch (err) {
+                showAlert('error', err.message);
+            }
+        });
+
+        // Load results
+        async function loadResults() {
+            try {
+                const res = await fetch('http://localhost:5000/results');
+                const data = await res.json();
+                resultsBody.innerHTML = '';
+                data.forEach(r => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `<td>${r.candidate_name}</td><td>${r.vote_count}</td>`;
+                    resultsBody.appendChild(row);
+                });
+            } catch (err) {
+                resultsBody.innerHTML = `<tr><td colspan="2" style="text-align:center;">Error loading results</td></tr>`;
+            }
+        }
+
+        // Logout
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            localStorage.removeItem('user');
+            window.location.href = 'user-login.html';
+        });
+
+        // Initialize
+        loadCandidates();
+        loadResults();
+        setInterval(loadResults, 5000);
+    </script>
+</body>
+</html>
