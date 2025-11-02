@@ -497,7 +497,7 @@
                     app.user.email = updateData.email;
                     app.user.national_id = updateData.national_id;
                     localStorage.setItem('user', JSON.stringify(app.user));
-                    helpers.$('welcomeMsg').textContent = `Welcome, ${updateData.fullname}!`;
+                    helpers.$('welcomeMsg').textContent = `Welcome ${updateData.fullname}`;
                     helpers.$('settingsCurrentPassword').value = '';
                     helpers.$('settingsPassword').value = '';
                     helpers.showAlert('Settings saved successfully!');
