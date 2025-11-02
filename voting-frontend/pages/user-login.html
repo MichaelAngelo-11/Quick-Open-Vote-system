@@ -9,6 +9,7 @@
 </head>
 
 <body>
+    <!-- User Login Form -->
     <div id="container">
         <div id="loginCard">
             <div id="header">
@@ -36,6 +37,7 @@
     </div>
 
     <script>
+        // Login Form Handling
         const loginForm = document.getElementById('loginForm');
         const usernameInput = document.getElementById('username');
         const passwordInput = document.getElementById('password');
@@ -45,6 +47,7 @@
         const successMessage = document.getElementById('successMessage');
         const buttonText = document.getElementById('buttonText');
 
+        // Hide alerts initially
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             errorAlert.style.display = 'none';

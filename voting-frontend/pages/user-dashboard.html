@@ -1,139 +1,145 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>User Dashboard - Voting System</title>
-  <link rel="stylesheet" href="../css/user-dashboard.css" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>User Dashboard - Voting System</title>
+    <link rel="stylesheet" href="../css/user-dashboard.css" />
 </head>
+
 <body>
-  <header class="dashboard-header">
-    <h1>Welcome to the Voting System</h1>
-    <button id="logoutBtn" class="logout-btn">Logout</button>
-  </header>
+    <!-- Dashboard Header -->
+    <header class="dashboard-header">
+        <h1>Welcome to the Voting System</h1>
+        <button id="logoutBtn" class="logout-btn">Logout</button>
+    </header>
 
-  <main class="dashboard-content">
-    <!-- Alert Section -->
-    <div id="alert" class="alert" style="display: none;"></div>
+    <main class="dashboard-content">
+        <!-- Alert Section -->
+        <div id="alert" class="alert" style="display: none;"></div>
 
-    <!-- Voting Section -->
-    <section class="voting-section">
-      <h2>Vote for Your Candidate</h2>
-      <div id="candidatesContainer" class="candidates-container">
-        <p>Loading candidates...</p>
-      </div>
-    </section>
+        <!-- Voting Section -->
+        <section class="voting-section">
+            <h2>Vote for Your Candidate</h2>
+            <div id="candidatesContainer" class="candidates-container">
+                <p>Loading candidates...</p>
+            </div>
+        </section>
 
-    <!-- Results Section -->
-    <section class="results-section">
-      <h2>Real-Time Voting Results</h2>
-      <table class="results-table">
-        <thead>
-          <tr>
-            <th>Candidate</th>
-            <th>Vote Count</th>
-          </tr>
-        </thead>
-        <tbody id="resultsBody">
-          <tr><td colspan="2" style="text-align:center;">Loading...</td></tr>
-        </tbody>
-      </table>
-    </section>
-  </main>
+        <!-- Results Section -->
+        <section class="results-section">
+            <h2>Real-Time Voting Results</h2>
+            <table class="results-table">
+                <thead>
+                    <tr>
+                        <th>Candidate</th>
+                        <th>Vote Count</th>
+                    </tr>
+                </thead>
+                <tbody id="resultsBody">
+                    <tr>
+                        <td colspan="2" style="text-align:center;">Loading...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+    </main>
 
-  <script>
-    const candidatesContainer = document.getElementById('candidatesContainer');
-    const resultsBody = document.getElementById('resultsBody');
-    const alertBox = document.getElementById('alert');
-    const user = JSON.parse(localStorage.getItem('user'));
+    <script>
+        const candidatesContainer = document.getElementById('candidatesContainer');
+        const resultsBody = document.getElementById('resultsBody');
+        const alertBox = document.getElementById('alert');
+        const user = JSON.parse(localStorage.getItem('user'));
 
-    // Redirect if not logged in
-    /*
-    if (!user) {
-      window.location.href = 'user-login.html';
-    }
-    */
+        // Redirect if not logged in
+        /*
+        if (!user) {
+          window.location.href = 'user-login.html';
+        }
+        */
 
-    // --- ALERTS ---
-    function showAlert(type, message) {
-      alertBox.className = `alert ${type}`;
-      alertBox.textContent = message;
-      alertBox.style.display = 'block';
-      setTimeout(() => (alertBox.style.display = 'none'), 3000);
-    }
+        // Alert display function
+        function showAlert(type, message) {
+            alertBox.className = `alert ${type}`;
+            alertBox.textContent = message;
+            alertBox.style.display = 'block';
+            setTimeout(() => (alertBox.style.display = 'none'), 3000);
+        }
 
-    // --- LOAD CANDIDATES ---
-    async function loadCandidates() {
-      try {
-        const res = await fetch('http://localhost:5000/candidates');
-        const data = await res.json();
+        // Load Candidates data
+        async function loadCandidates() {
+            try {
+                const res = await fetch('http://localhost:5000/candidates');
+                const data = await res.json();
 
-        candidatesContainer.innerHTML = '';
+                candidatesContainer.innerHTML = '';
 
-        data.forEach((candidate) => {
-          const card = document.createElement('div');
-          card.classList.add('candidate-card');
-          card.innerHTML = `
+                data.forEach((candidate) => {
+                    const card = document.createElement('div');
+                    card.classList.add('candidate-card');
+                    card.innerHTML = `
             <img src="${candidate.photo_url || '../images/default-user.png'}" alt="${candidate.name}" class="candidate-photo" />
             <h3>${candidate.name}</h3>
             <p><strong>Position:</strong> ${candidate.position}</p>
             <button class="vote-btn" data-id="${candidate.id}">Vote</button>
           `;
-          candidatesContainer.appendChild(card);
+                    candidatesContainer.appendChild(card);
+                });
+
+                document.querySelectorAll('.vote-btn').forEach((btn) => {
+                    btn.addEventListener('click', () => submitVote(btn.dataset.id));
+                });
+            } catch (err) {
+                showAlert('error', 'Error loading candidates.');
+            }
+        }
+
+        // Submit Vote handling
+        async function submitVote(candidateId) {
+            try {
+                const res = await fetch('http://localhost:5000/votes', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: user?.id, candidate_id: candidateId }),
+                });
+                const data = await res.json();
+
+                if (!res.ok) throw new Error(data.message || 'Vote failed');
+                showAlert('success', 'Vote submitted successfully!');
+                loadResults();
+            } catch (err) {
+                showAlert('error', err.message);
+            }
+        }
+
+        //  Load results
+        async function loadResults() {
+            try {
+                const res = await fetch('http://localhost:5000/results');
+                const data = await res.json();
+                resultsBody.innerHTML = '';
+                data.forEach((r) => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `<td>${r.candidate_name}</td><td>${r.vote_count}</td>`;
+                    resultsBody.appendChild(row);
+                });
+            } catch (err) {
+                resultsBody.innerHTML = `<tr><td colspan="2" style="text-align:center;">Error loading results</td></tr>`;
+            }
+        }
+
+        // Logout Handling
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            localStorage.removeItem('user');
+            window.location.href = 'user-login.html';
         });
 
-        document.querySelectorAll('.vote-btn').forEach((btn) => {
-          btn.addEventListener('click', () => submitVote(btn.dataset.id));
-        });
-      } catch (err) {
-        showAlert('error', 'Error loading candidates.');
-      }
-    }
-
-    // --- SUBMIT VOTE ---
-    async function submitVote(candidateId) {
-      try {
-        const res = await fetch('http://localhost:5000/votes', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ user_id: user?.id, candidate_id: candidateId }),
-        });
-        const data = await res.json();
-
-        if (!res.ok) throw new Error(data.message || 'Vote failed');
-        showAlert('success', 'Vote submitted successfully!');
+        // Initial Load 
+        loadCandidates();
         loadResults();
-      } catch (err) {
-        showAlert('error', err.message);
-      }
-    }
-
-    // --- LOAD RESULTS ---
-    async function loadResults() {
-      try {
-        const res = await fetch('http://localhost:5000/results');
-        const data = await res.json();
-        resultsBody.innerHTML = '';
-        data.forEach((r) => {
-          const row = document.createElement('tr');
-          row.innerHTML = `<td>${r.candidate_name}</td><td>${r.vote_count}</td>`;
-          resultsBody.appendChild(row);
-        });
-      } catch (err) {
-        resultsBody.innerHTML = `<tr><td colspan="2" style="text-align:center;">Error loading results</td></tr>`;
-      }
-    }
-
-    // --- LOGOUT ---
-    document.getElementById('logoutBtn').addEventListener('click', () => {
-      localStorage.removeItem('user');
-      window.location.href = 'user-login.html';
-    });
-
-    // --- INIT ---
-    loadCandidates();
-    loadResults();
-    setInterval(loadResults, 5000); // Refresh results every 5 seconds
-  </script>
+        setInterval(loadResults, 5000); // Refresh results every 5 seconds
+    </script>
 </body>
+
 </html>

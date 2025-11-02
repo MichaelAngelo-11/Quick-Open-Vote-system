@@ -1,6 +1,6 @@
 const getDBConnection = require("../db");
 
-// ✅ Cast a vote
+// Cast a vote
 async function castVote(req, res) {
   try {
     const { user_id, election_id, candidate_id, vote_time } = req.body;
@@ -23,7 +23,7 @@ async function castVote(req, res) {
   }
 }
 
-// ✅ Get all votes for a specific election
+// Get all votes for a specific election
 async function getVotesByElection(req, res) {
   try {
     const { election_id } = req.params;

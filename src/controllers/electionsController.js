@@ -1,6 +1,6 @@
 const getDBConnection = require("../db");
 
-// ✅ Create a new election
+// Create a new election
 async function createElection(req, res) {
   try {
     const { title, description, start_date, end_date, status } = req.body;
@@ -23,7 +23,7 @@ async function createElection(req, res) {
   }
 }
 
-// ✅ Fetch all elections
+// Fetch all elections
 async function getAllElections(req, res) {
   try {
     const db = getDBConnection();
