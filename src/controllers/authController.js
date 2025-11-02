@@ -62,4 +62,84 @@ function deleteUser(req, res) {
   db.close();
 }
 
-module.exports = { registerUser, loginUser, deleteUser };
+// Get All Users
+function getAllUsers(req, res) {
+  const db = getDBConnection();
+
+  db.all("SELECT * FROM users", [], (err, users) => {
+    if (err) {
+      return res.status(500).json({ message: "❌ Error fetching users", error: err.message });
+    }
+    res.json(users);
+  });
+
+  db.close();
+}
+
+// Update User
+function updateUser(req, res) {
+  const { user_id } = req.params;
+  const { fullname, username, email, national_id, password, currentPassword } = req.body;
+  const db = getDBConnection();
+
+  // First verify the current password if password change is requested
+  if (password && currentPassword) {
+    db.get("SELECT password FROM users WHERE user_id = ?", [user_id], (err, user) => {
+      if (err) {
+        db.close();
+        return res.status(500).json({ message: "❌ Error verifying password", error: err.message });
+      }
+      if (!user) {
+        db.close();
+        return res.status(404).json({ message: "❌ User not found" });
+      }
+      if (user.password !== currentPassword) {
+        db.close();
+        return res.status(401).json({ message: "❌ Current password is incorrect" });
+      }
+      
+      // Password verified, proceed with update including new password
+      performUpdate(true);
+    });
+  } else {
+    // No password change, just update other fields
+    performUpdate(false);
+  }
+
+  function performUpdate(includePassword) {
+    let query, params;
+    
+    if (includePassword) {
+      query = `UPDATE users SET fullname = ?, username = ?, email = ?, national_id = ?, password = ? WHERE user_id = ?`;
+      params = [fullname, username, email, national_id, password, user_id];
+    } else {
+      query = `UPDATE users SET fullname = ?, username = ?, email = ?, national_id = ? WHERE user_id = ?`;
+      params = [fullname, username, email, national_id, user_id];
+    }
+
+    db.run(query, params, function(err) {
+      if (err) {
+        db.close();
+        return res.status(500).json({ message: "❌ Error updating user", error: err.message });
+      }
+      if (this.changes === 0) {
+        db.close();
+        return res.status(404).json({ message: "❌ User not found" });
+      }
+      
+      // Fetch updated user to return
+      db.get("SELECT user_id, username, fullname, email, national_id, role_id FROM users WHERE user_id = ?", [user_id], (err, updatedUser) => {
+        db.close();
+        if (err) {
+          return res.status(500).json({ message: "⚠️ Updated but error fetching data", error: err.message });
+        }
+        res.json({ 
+          message: "✅ Profile updated successfully", 
+          user: updatedUser 
+        });
+      });
+    });
+  }
+}
+
+module.exports = { registerUser, loginUser, deleteUser, getAllUsers, updateUser };
