@@ -4,6 +4,7 @@ const cors = require("cors");
 const authRoutes = require("./routes/auth");
 const electionsRoutes = require("./routes/elections");
 const votesRoutes = require("./routes/votes");
+const candidatesRoutes = require("./routes/candidates");
 const getDBConnection = require("./db");
 
 const app = express();
@@ -32,6 +33,8 @@ app.use("/elections", electionsRoutes);
 // Votes routes
 app.use("/votes", votesRoutes);
 
+// Candidates routes
+app.use("/candidates", candidatesRoutes);
 
 // Start the server
 
