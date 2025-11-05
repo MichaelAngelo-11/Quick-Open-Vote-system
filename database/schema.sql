@@ -19,10 +19,10 @@ CREATE TABLE IF NOT EXISTS users (
   username TEXT NOT NULL UNIQUE,
   password TEXT NOT NULL,
   fullname TEXT NOT NULL,
-  national_id TEXT NOT NULL UNIQUE,
+  school_id TEXT NOT NULL UNIQUE,
   role_id INTEGER NOT NULL,
   email TEXT NOT NULL UNIQUE,
-  time_registered TEXT NOT NULL,
+  time_registered TEXT DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (role_id) REFERENCES roles(role_id)
 );
 

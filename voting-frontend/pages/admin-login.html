@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin</title>
+    <link rel="stylesheet" href="../css/login.css">
+</head>
+<body>
+    <div id="container">
+        <div id="loginCard">
+            <div id="header">
+                <h1>Voting System</h1>
+                <p>Admin Login</p>
+            </div>
+            <div id="errorAlert"><span id="errorMessage"></span></div>
+            <div id="successAlert"><span id="successMessage"></span></div>
+            <form id="loginForm">
+                <label for="username">Username</label>
+                <input type="text" id="username" placeholder="Enter your username" required>
+                <label for="password">Password</label>
+                <input type="password" id="password" placeholder="Enter your password" required>
+                <button type="submit" id="loginButton"><span id="buttonText">Login</span></button>
+            </form>
+            <div id="footer">
+                <p>Only for admin use</p>
+            </div>
+        </div>
+    </div>
+    <script>
+        // Login logic
+        const loginForm = document.getElementById('loginForm');
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+        const errorAlert = document.getElementById('errorAlert');
+        const errorMessage = document.getElementById('errorMessage');
+        const successAlert = document.getElementById('successAlert');
+        const successMessage = document.getElementById('successMessage');
+        const buttonText = document.getElementById('buttonText');
+        // Handle form submission
+        loginForm.onsubmit = async function(e) {
+            e.preventDefault();
+            errorAlert.style.display = 'none';
+            successAlert.style.display = 'none';
+            buttonText.textContent = 'Logging in...';
+            const username = usernameInput.value.trim();
+            const password = passwordInput.value;
+            // If username or password is empty return error
+            if (!username || !password) {
+                errorMessage.textContent = 'Please enter both username and password.';
+                errorAlert.style.display = 'block';
+                buttonText.textContent = 'Login';
+                return;
+            }
+            // Call the login API from the server.js
+            // Implement try-catch block for network errors
+            try {
+                const res = await fetch('http://localhost:5000/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                const data = await res.json();
+                if (!res.ok) {
+                    errorMessage.textContent = data.message || 'Login failed';
+                    errorAlert.style.display = 'block';
+                    buttonText.textContent = 'Login';
+                    return;
+                }
+                if (data.role_id !== 2) {
+                    errorMessage.textContent = 'Access denied. Only admin accounts can login.';
+                    errorAlert.style.display = 'block';
+                    buttonText.textContent = 'Login';
+                    return;
+                }
+                localStorage.setItem('user', JSON.stringify(data));
+                successMessage.textContent = 'Login successful! Redirecting...';
+                successAlert.style.display = 'block';
+                // Redirect to admin dashboard after successful login
+                setTimeout(() => {
+                    window.location.href = 'admin-dashboard.html';
+                }, 1000);
+                //Prompt try again
+            } catch (err) {
+                errorMessage.textContent = 'Network error. Please try again.';
+                errorAlert.style.display = 'block';
+            } finally {
+                buttonText.textContent = 'Login';
+            }
+        };
+    </script>
+</body>
+</html>

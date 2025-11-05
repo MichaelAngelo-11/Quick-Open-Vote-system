@@ -1,0 +1,119 @@
+* { box-sizing: border-box; }
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #0052cc 0%, #003d99 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    padding: 20px;
+}
+
+#container {
+    width: 100%;
+    max-width: 420px;
+}
+
+#loginCard {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    padding: 40px 32px;
+}
+
+#header {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+#header h1 {
+    font-size: 2.2rem;
+    color: #0052cc;
+    margin: 0 0 8px 0;
+    font-weight: 600;
+}
+
+#header p {
+    font-size: 1.1rem;
+    color: #555;
+    margin: 0;
+}
+
+label {
+    display: block;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 6px;
+    font-size: 0.95rem;
+}
+
+input {
+    width: 100%;
+    padding: 12px 14px;
+    margin-bottom: 18px;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+    font-size: 1rem;
+    font-family: inherit;
+    transition: all 0.2s ease;
+}
+
+input:focus {
+    outline: none;
+    border-color: #0052cc;
+    box-shadow: 0 0 0 3px rgba(0,82,204,0.1);
+}
+
+button {
+    width: 100%;
+    padding: 14px 20px;
+    border-radius: 6px;
+    border: none;
+    background: #0052cc;
+    color: #fff;
+    font-size: 1.05rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+button:hover {
+    background: #003d99;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0,82,204,0.3);
+}
+
+button:active {
+    transform: translateY(0);
+}
+
+#errorAlert {
+    display: none;
+    background: #f8d7da;
+    border-left: 4px solid #dc3545;
+    color: #721c24;
+    padding: 14px 16px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    font-weight: 500;
+}
+
+#successAlert {
+    display: none;
+    background: #d4edda;
+    border-left: 4px solid #28a745;
+    color: #155724;
+    padding: 14px 16px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    font-weight: 500;
+}
+
+#footer {
+    text-align: center;
+    margin-top: 24px;
+    font-size: 0.9rem;
+    color: #777;
+}

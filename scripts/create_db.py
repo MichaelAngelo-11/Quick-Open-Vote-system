@@ -14,7 +14,7 @@ if os.path.exists(db_path):
 else:
     print("Creating new database...")
     
-    # Connect to the database (this creates it if it doesn't exist)
+    # Connect to the database 
     conn = sqlite3.connect(db_path)
     
     # Read the schema file
@@ -32,3 +32,4 @@ else:
     
     print("Database created successfully!")
     print("Location:", db_path)
+
