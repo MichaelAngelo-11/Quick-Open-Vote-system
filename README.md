@@ -41,7 +41,7 @@ That's it!
 ## Project Structure
 
 ```
-votehub/
+Quick-Open Vote/
 ├── package.json              # Project dependencies
 ├── node_modules/             # Installed packages
 ├── backend/
@@ -118,7 +118,7 @@ Expected response:
 {
   "status": "ok",
   "timestamp": "2025-11-10T...",
-  "message": "VoteHub backend is running!"
+  "message": "Quick-Open Vote backend is running!"
 }
 ```
 

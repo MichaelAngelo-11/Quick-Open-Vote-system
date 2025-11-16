@@ -1,5 +1,4 @@
--- VoteHub Database Schema (Updated)
--- SQLite database matching our actual implementation
+-- Quick-Open Vote Database Schema
 
 -- VotingSession table
 CREATE TABLE IF NOT EXISTS VotingSession (

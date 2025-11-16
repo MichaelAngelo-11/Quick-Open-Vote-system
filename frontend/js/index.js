@@ -1,4 +1,4 @@
-// Home Page - Landing page for VoteHub
+// Home Page - Landing page for Quick-Open Vote
 
 const { useState } = React;
 
@@ -24,7 +24,7 @@ function HomePage() {
           React.createElement('h1', { 
             className: 'text-3xl md:text-4xl font-bold',
             style: { fontSize: '3rem' }
-          }, 'VoteHub'),
+          }, 'Quick-Open Vote'),
           React.createElement('p', { 
             className: 'text-xl text-muted-foreground'
           }, 'Democratic Voting Made Simple')
@@ -37,12 +37,14 @@ function HomePage() {
         },
           React.createElement(Components.Button, {
             onClick: handleCreate,
-            className: 'btn btn-primary btn-lg w-full sm:w-auto'
+            className: 'btn btn-primary btn-lg',
+            style: { width: 'fit-content' }
           }, 'Create Voting Session'),
           
           React.createElement(Components.Button, {
             onClick: () => setShowJoinDialog(true),
-            className: 'btn btn-outline btn-lg w-full sm:w-auto'
+            className: 'btn btn-outline btn-lg',
+            style: { width: 'fit-content' }
           }, 'Join Voting Session')
         ),
         

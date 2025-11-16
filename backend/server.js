@@ -32,7 +32,7 @@ app.get('/api/health', (req, res) => {
   res.json({ 
     status: 'ok',
     timestamp: new Date().toISOString(),
-    message: 'VoteHub is running!'
+    message: 'Quick-Open Vote is running!'
   });
 });
 

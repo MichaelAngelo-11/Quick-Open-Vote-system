@@ -42,7 +42,7 @@ function VotingPage() {
             
             // Casual mode: check if already voted (using localStorage as client-side marker)
             if (data.session.mode === 'casual') {
-                const storageKey = `votehub_voted_${data.session.id}`;
+                const storageKey = `Quick-Open Vote_voted_${data.session.id}`;
                 const hasVoted = localStorage.getItem(storageKey);
                 if (hasVoted) {
                     setError('You have already voted in this session');
@@ -134,7 +134,7 @@ function VotingPage() {
 
             // Mark as voted (casual mode only)
             if (session.mode === 'casual') {
-                const storageKey = `votehub_voted_${session.id}`;
+                const storageKey = `Quick-Open Vote_voted_${session.id}`;
                 localStorage.setItem(storageKey, response.voterId);
             }
 
