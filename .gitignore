@@ -29,3 +29,5 @@ npm-debug.log*
 # Build outputs (if needed in future)
 dist/
 build/
+
+/misc
