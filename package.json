@@ -1,6 +1,5 @@
 {
   "name": "quick-open-vote-system",
-  "version": "1.0.0",
   "scripts": {
     "dev": "node backend/server.js"
   },
