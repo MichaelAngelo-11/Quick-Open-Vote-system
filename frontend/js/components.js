@@ -1,219 +1,219 @@
 // shadcn/ui-inspired React components using React CDN
 
-const { createElement: h } = React;
+const {createElement: h} = React;
 
 /**
- * Button Component
- * @param {object} props - Component properties
- * @param {ReactNode} props.children - Button text/content
- * @param {function} props.onClick - Click handler
- * @param {string} props.variant - Button style (primary, outline, ghost, destructive)
- * @param {string} props.size - Button size (sm, default, lg)
- * @param {boolean} props.disabled - Whether button is disabled
- * @param {string} props.className - Additional CSS classes
+ * Renders a customizable button with various styles and sizes
+ * @param {object} props
+ * @param {ReactNode} props.children - Button label
+ * @param {function} props.onClick - Handler for click events
+ * @param {string} props.variant - Style variant
+ * @param {string} props.size - Size option
+ * @param {boolean} props.disabled - Disable the button
+ * @param {string} props.className - Extra CSS classes
  */
-function Button({ 
-  children, 
-  onClick, 
-  variant = 'default', 
-  size = 'default',
-  disabled = false,
-  className = '',
-  type = 'button'
-}) {
-  const classes = `btn btn-${variant} ${size !== 'default' ? `btn-${size}` : ''} ${className}`;
-  
-  return h('button', {
-    type,
-    onClick,
-    disabled,
-    className: classes,
-  }, children);
+function Button({
+                    children,
+                    onClick,
+                    variant = 'default',
+                    size = 'default',
+                    disabled = false,
+                    className = '',
+                    type = 'button'
+                }) {
+    const classes = `btn btn-${variant} ${size !== 'default' ? `btn-${size}` : ''} ${className}`;
+
+    return h('button', {
+        type,
+        onClick,
+        disabled,
+        className: classes,
+    }, children);
 }
 
 /**
- * Card Component - Container with styling
+ * Card - Basic container for grouping content
  */
-function Card({ children, className = '' }) {
-  return h('div', { className: `card ${className}` }, children);
+function Card({children, className = ''}) {
+    return h('div', {className: `card ${className}`}, children);
 }
 
 /**
- * Card Header Component
+ * Card Header - Top section of a card
  */
-function CardHeader({ children, className = '' }) {
-  return h('div', { className: `card-header ${className}` }, children);
+function CardHeader({children, className = ''}) {
+    return h('div', {className: `card-header ${className}`}, children);
 }
 
 /**
- * Card Title Component
+ * Card Title - Main heading for card content
  */
-function CardTitle({ children, className = '' }) {
-  return h('h2', { className: `card-title ${className}` }, children);
+function CardTitle({children, className = ''}) {
+    return h('h2', {className: `card-title ${className}`}, children);
 }
 
 /**
- * Card Description Component
+ * Card Description - Subtitle or supplementary text
  */
-function CardDescription({ children, className = '' }) {
-  return h('p', { className: `card-description ${className}` }, children);
+function CardDescription({children, className = ''}) {
+    return h('p', {className: `card-description ${className}`}, children);
 }
 
 /**
- * Card Content Component
+ * Card Content - Main body of the card
  */
-function CardContent({ children, className = '' }) {
-  return h('div', { className: `card-content ${className}` }, children);
+function CardContent({children, className = ''}) {
+    return h('div', {className: `card-content ${className}`}, children);
 }
 
 /**
- * Input Component
+ * Input - Text input field with basic validation
  */
-function Input({ 
-  type = 'text', 
-  placeholder = '', 
-  value, 
-  onChange, 
-  disabled = false,
-  className = '',
-  id = ''
-}) {
-  return h('input', {
-    type,
-    placeholder,
-    value,
-    onChange,
-    disabled,
-    className: `input ${className}`,
-    id,
-  });
+function Input({
+                   type = 'text',
+                   placeholder = '',
+                   value,
+                   onChange,
+                   disabled = false,
+                   className = '',
+                   id = ''
+               }) {
+    return h('input', {
+        type,
+        placeholder,
+        value,
+        onChange,
+        disabled,
+        className: `input ${className}`,
+        id,
+    });
 }
 
 /**
- * Textarea Component
+ * Textarea - Multi-line text input
  */
-function Textarea({ 
-  placeholder = '', 
-  value, 
-  onChange, 
-  rows = 4,
-  disabled = false,
-  className = '',
-  id = ''
-}) {
-  return h('textarea', {
-    placeholder,
-    value,
-    onChange,
-    rows,
-    disabled,
-    className: `textarea ${className}`,
-    id,
-  });
+function Textarea({
+                      placeholder = '',
+                      value,
+                      onChange,
+                      rows = 4,
+                      disabled = false,
+                      className = '',
+                      id = ''
+                  }) {
+    return h('textarea', {
+        placeholder,
+        value,
+        onChange,
+        rows,
+        disabled,
+        className: `textarea ${className}`,
+        id,
+    });
 }
 
 /**
- * Label Component
+ * Label - Form label for accessibility
  */
-function Label({ children, htmlFor = '', className = '' }) {
-  return h('label', {
-    htmlFor,
-    className: `label ${className}`,
-  }, children);
+function Label({children, htmlFor = '', className = ''}) {
+    return h('label', {
+        htmlFor,
+        className: `label ${className}`,
+    }, children);
 }
 
 /**
- * Badge Component
+ * Badge - Small tag or status indicator
  */
-function Badge({ children, variant = 'default', className = '' }) {
-  return h('span', {
-    className: `badge badge-${variant} ${className}`,
-  }, children);
+function Badge({children, variant = 'default', className = ''}) {
+    return h('span', {
+        className: `badge badge-${variant} ${className}`,
+    }, children);
 }
 
 /**
- * Loading Spinner Component
+ * Spinner - Loading animation
  */
 function Spinner() {
-  return h('div', { className: 'spinner' });
+    return h('div', {className: 'spinner'});
 }
 
 /**
- * Loading Container Component
+ * Loading - Displays spinner with optional message
  */
-function Loading({ message = 'Loading...' }) {
-  return h('div', { className: 'loading-container' },
-    h(Spinner),
-    h('p', { className: 'mt-4' }, message)
-  );
+function Loading({message = 'Loading...'}) {
+    return h('div', {className: 'loading-container'},
+        h(Spinner),
+        h('p', {className: 'mt-4'}, message)
+    );
 }
 
 /**
- * Alert Component
+ * Alert - Notification box with different severity levels
  */
-function Alert({ children, variant = 'info', className = '' }) {
-  return h('div', {
-    className: `alert alert-${variant} ${className}`,
-  }, children);
+function Alert({children, variant = 'info', className = ''}) {
+    return h('div', {
+        className: `alert alert-${variant} ${className}`,
+    }, children);
 }
 
 /**
- * Dialog/Modal Component
+ * Dialog - Modal popup that closes on overlay click
  */
-function Dialog({ 
-  isOpen, 
-  onClose, 
-  title, 
-  description, 
-  children 
-}) {
-  if (!isOpen) return null;
-  
-  return h('div', { 
-    className: 'dialog-overlay',
-    onClick: (e) => {
-      // Close on overlay click (not dialog content)
-      if (e.target.className === 'dialog-overlay') {
-        onClose();
-      }
-    }
-  },
-    h(Card, { className: 'dialog' },
-      title && h('div', { className: 'dialog-header' },
-        h('h2', { className: 'dialog-title' }, title),
-        description && h('p', { className: 'dialog-description' }, description)
-      ),
-      children
-    )
-  );
+function Dialog({
+                    isOpen,
+                    onClose,
+                    title,
+                    description,
+                    children
+                }) {
+    if (!isOpen) return null;
+
+    return h('div', {
+            className: 'dialog-overlay',
+            onClick: (e) => {
+                // Only close if clicking the overlay, not the dialog itself
+                if (e.target.className === 'dialog-overlay') {
+                    onClose();
+                }
+            }
+        },
+        h(Card, {className: 'dialog'},
+            title && h('div', {className: 'dialog-header'},
+                h('h2', {className: 'dialog-title'}, title),
+                description && h('p', {className: 'dialog-description'}, description)
+            ),
+            children
+        )
+    );
 }
 
 /**
- * Form Group Component - Wraps label + input together
+ * FormGroup - Pairs a label with an input field
  */
-function FormGroup({ label, children, htmlFor = '' }) {
-  return h('div', { className: 'form-group' },
-    label && h(Label, { htmlFor }, label),
-    children
-  );
+function FormGroup({label, children, htmlFor = ''}) {
+    return h('div', {className: 'form-group'},
+        label && h(Label, {htmlFor}, label),
+        children
+    );
 }
 
 // Export all components to window.Components
 // This makes them available in other files
 window.Components = {
-  Button,
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-  Input,
-  Textarea,
-  Label,
-  Badge,
-  Spinner,
-  Loading,
-  Alert,
-  Dialog,
-  FormGroup,
+    Button,
+    Card,
+    CardHeader,
+    CardTitle,
+    CardDescription,
+    CardContent,
+    Input,
+    Textarea,
+    Label,
+    Badge,
+    Spinner,
+    Loading,
+    Alert,
+    Dialog,
+    FormGroup,
 };

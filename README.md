@@ -1,6 +1,7 @@
 # Quick-Open Vote System - Democratic Voting Made Simple
 
-A production-ready voting system with official (email-based) and casual (code-based) voting modes. Features real-time results, duplicate vote prevention, and a comprehensive admin dashboard.
+A production-ready voting system with official (email-based) and casual (code-based) voting modes. Features real-time
+results, duplicate vote prevention, and a comprehensive admin dashboard.
 
 ---
 
@@ -14,6 +15,7 @@ npm install
 ```
 
 This installs:
+
 - express - Web server
 - better-sqlite3 - SQLite database
 - cors - CORS middleware
@@ -25,6 +27,7 @@ npm start
 ```
 
 You should see:
+
 ```
 Database initialized
 Server running on http://localhost:3000
@@ -78,20 +81,24 @@ Quick-Open Vote/
 ## Key Features
 
 ### Voting Modes
+
 - **Official Mode**: Email-based invitations with vote tracking
 - **Casual Mode**: Open voting with session code access
 
 ### Result Display Options
+
 - **Realtime**: Results visible during voting (5-second refresh)
 - **After Voting Closes**: Results appear only when session is closed (3-second polling)
 
 ### Security & Integrity
+
 - **Duplicate vote prevention** (name-based + localStorage)
 - **Session access control** (admin codes vs voter codes)
 - Foreign key constraints in database
 - Vote timestamps for audit trail
 
 ### Admin Dashboard
+
 - Session settings managemen
 - Candidate CRUD operations
 - Invited voter management** (official mode) with vote timestamps
@@ -100,6 +107,7 @@ Quick-Open Vote/
 - Auto-refresh
 
 ### Voter Experience
+
 - Clean, professional interface with plain text buttons
 - Simple candidate selection
 - Real-time vote confirmation
@@ -114,6 +122,7 @@ curl http://localhost:3000/api/health
 ```
 
 Expected response:
+
 ```json
 {
   "status": "ok",
@@ -127,35 +136,39 @@ Expected response:
 ## How to Use
 
 ### Create a Voting Session
+
 1. Go to http://localhost:3000
 2. Click "Create Voting Session"
 3. Fill in session details:
-   - Session name
-   - Voting mode (Official or Casual)
-   - Result display preference (Realtime or After Closes)
+    - Session name
+    - Voting mode (Official or Casual)
+    - Result display preference (Realtime or After Closes)
 4. Add positions and candidates
 5. (Optional) Add invited voters for official mode
 6. Click "Create Session"
 7. Save the **Admin Code** (for managing session) and **Voter Code** (for sharing)
 
 ### Vote in a Session
+
 1. Click "Join Voting Session" or visit `/vote.html?code=VOTER_CODE`
 2. Enter your name
 3. Select one candidate per position
 4. Submit your vote
 
 ### View Results
+
 1. Visit `/results.html?code=VOTER_CODE`
 2. Results auto-refresh based on session settings
 3. Winners are highlighted with gold badges
 
 ### Manage Session (Admin)
+
 1. Visit `/admin.html?code=ADMIN_CODE`
 2. Access 4 tabs:
-   - **Settings**: Update session details, close/reopen voting, access admin/voting links
-   - **Candidates**: Add/edit/delete candidates
-   - **Voters**: Manage invited voters with vote timestamps (official mode only)
-   - **Results**: View live results with vote counts (auto-refreshes every 10 seconds)
+    - **Settings**: Update session details, close/reopen voting, access admin/voting links
+    - **Candidates**: Add/edit/delete candidates
+    - **Voters**: Manage invited voters with vote timestamps (official mode only)
+    - **Results**: View live results with vote counts (auto-refreshes every 10 seconds)
 
 **Note**: Admin dashboard and results pages auto-refresh - no manual refresh button needed.
 
@@ -164,25 +177,29 @@ Expected response:
 ## 🏗️ Architecture
 
 ### Frontend
-- **React 18** (CDN-based, no build tools)  
-- **React.createElement syntax** (no JSX compilation)  
-- **Vanilla CSS** with design tokens and utility classes  
-- **Professional UI** with plain text buttons  
+
+- **React 18** (CDN-based, no build tools)
+- **React.createElement syntax** (no JSX compilation)
+- **Vanilla CSS** with design tokens and utility classes
+- **Professional UI** with plain text buttons
 
 ### Backend
-- **Node.js + Express** for server and API  
-- **SQLite (better-sqlite3)** for database  
-- **Prepared statements** for SQL injection prevention  
-- **Foreign key constraints** for data integrity  
+
+- **Node.js + Express** for server and API
+- **SQLite (better-sqlite3)** for database
+- **Prepared statements** for SQL injection prevention
+- **Foreign key constraints** for data integrity
 
 ### Database Schema
-- **VotingSession**: Session metadata with voting settings  
-- **Position**: Positions to vote for (linked to sessions)  
-- **Candidate**: Candidates per position  
-- **Vote**: Vote records with timestamps and duplicate prevention  
-- **InvitedVoter**: Email-based voter management with vote timestamps (official mode)  
+
+- **VotingSession**: Session metadata with voting settings
+- **Position**: Positions to vote for (linked to sessions)
+- **Candidate**: Candidates per position
+- **Vote**: Vote records with timestamps and duplicate prevention
+- **InvitedVoter**: Email-based voter management with vote timestamps (official mode)
 
 ### Database Features
+
 - **Auto-migration**: Existing databases automatically upgrade on server start
 - **Timestamps**: All votes tracked with dd/mm/yyyy hh:mm:ss precision
 - **Foreign keys**: Cascading deletes maintain referential integrity
@@ -193,18 +210,21 @@ Expected response:
 ## Troubleshooting
 
 ### Port Already in Use
+
 ```bash
 lsof -i :3000
 kill -9 PID  # Replace PID with actual process number
 ```
 
 ### Blank Page or Console Errors
+
 1. Hard refresh: `Ctrl+Shift+R` (or `Cmd+Shift+R` on Mac)
 2. Open DevTools (F12) → Check Console and Network tabs
 3. Verify React loads from CDN (check Network tab)
 4. Restart the server: `npm start`
 
 ### Database Issues
+
 ```bash
 # Reset database (WARNING: deletes all data)
 rm backend/database.sqlite
@@ -216,18 +236,21 @@ npm start  # Auto-creates fresh database
 ## Development Notes
 
 ### No Build Tools Required
+
 - Direct HTML/CSS/JS editing
 - Refresh browser to see changes
 - No compilation or bundling needed
 - Uses React.createElement (no JSX/Babel)
 
 ### Easy Debugging
+
 - `console.log()` anywhere in JS files
 - Chrome DevTools for debugging
 - Network tab shows all API calls
 - SQLite database is human-readable
 
 ### Code Organization
+
 - All styles in one CSS file
 - Each page has dedicated JS file
 - Shared components in `components.js`

@@ -1,13 +1,13 @@
-const { useState, useEffect } = React;
+const {useState, useEffect} = React;
 
 const RE = React.createElement;
 
-// Create Voting Session - Single page form
+// Main component for setting up a new voting session
 function CreateSessionPage() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
-    
+
     const [sessionData, setSessionData] = useState({
         title: '',
         description: '',
@@ -26,7 +26,7 @@ function CreateSessionPage() {
     const [emailInput, setEmailInput] = useState('');
     const fileInputRef = React.useRef(null);
 
-    // Email handling - split by newlines and commas
+    // Parse emails from textarea - support both comma and line breaks
     const addEmailsFromText = () => {
         if (!emailInput.trim()) return;
 
@@ -44,7 +44,7 @@ function CreateSessionPage() {
         }
 
         const uniqueEmails = [...new Set([...sessionData.invitedEmails, ...validEmails])];
-        setSessionData({ ...sessionData, invitedEmails: uniqueEmails });
+        setSessionData({...sessionData, invitedEmails: uniqueEmails});
         setEmailInput('');
         setError('');
         setSuccess(`Added ${validEmails.length} email(s)`);
@@ -67,7 +67,7 @@ function CreateSessionPage() {
             const emails = [];
 
             lines.forEach((line, index) => {
-                // Skip header row (common CSV header names)
+                // Skip first line if it looks like a header
                 if (index === 0 && /email|mail|address/i.test(line)) {
                     return;
                 }
@@ -87,7 +87,7 @@ function CreateSessionPage() {
             }
 
             const uniqueEmails = [...new Set([...sessionData.invitedEmails, ...emails])];
-            setSessionData({ ...sessionData, invitedEmails: uniqueEmails });
+            setSessionData({...sessionData, invitedEmails: uniqueEmails});
             setError('');
             setSuccess(`Imported ${emails.length} email(s) from CSV`);
             setTimeout(() => setSuccess(''), 3000);
@@ -116,7 +116,7 @@ function CreateSessionPage() {
             description: '',
             photoUrl: ''
         });
-        setSessionData({ ...sessionData, positions: updated });
+        setSessionData({...sessionData, positions: updated});
         utils.focusElement(`[data-candidate-name="${positionIndex}-0"]`);
     };
 
@@ -126,13 +126,13 @@ function CreateSessionPage() {
             ...updated[positionIndex].candidates[candidateIndex],
             [field]: value
         };
-        setSessionData({ ...sessionData, positions: updated });
+        setSessionData({...sessionData, positions: updated});
     };
 
     const removeCandidate = (positionIndex, candidateIndex) => {
         const updated = [...sessionData.positions];
         updated[positionIndex].candidates = updated[positionIndex].candidates.filter((_, i) => i !== candidateIndex);
-        setSessionData({ ...sessionData, positions: updated });
+        setSessionData({...sessionData, positions: updated});
     };
 
     const addPosition = () => {
@@ -153,8 +153,8 @@ function CreateSessionPage() {
 
     const updatePosition = (index, field, value) => {
         const updated = [...sessionData.positions];
-        updated[index] = { ...updated[index], [field]: value };
-        setSessionData({ ...sessionData, positions: updated });
+        updated[index] = {...updated[index], [field]: value};
+        setSessionData({...sessionData, positions: updated});
     };
 
     const removePosition = (index) => {
@@ -168,7 +168,8 @@ function CreateSessionPage() {
 
     const createSession = async () => {
         setError('');
-        
+
+        // Validate required fields
         if (!sessionData.title.trim()) {
             setError('Please enter a session title');
             return;
@@ -181,10 +182,10 @@ function CreateSessionPage() {
             setError('Please add at least one position');
             return;
         }
-        
-        // Each position needs title, 2+ candidates with names
-        const allPositionsValid = sessionData.positions.every(pos => 
-            pos.title.trim() && pos.candidates.length >= 2 && 
+
+        // Make sure each position has title, minimum 2 candidates with names
+        const allPositionsValid = sessionData.positions.every(pos =>
+            pos.title.trim() && pos.candidates.length >= 2 &&
             pos.candidates.every(c => c.name.trim())
         );
 
@@ -211,7 +212,7 @@ function CreateSessionPage() {
             }
 
             window.location.href = `/admin.html?code=${data.adminCode}`;
-            
+
         } catch (err) {
             setError(err.message);
         } finally {
@@ -219,13 +220,13 @@ function CreateSessionPage() {
         }
     };
 
-    return RE('div', { className: 'min-h-screen' },
-        // Header
-        RE('header', { className: 'border-b' },
-            RE('div', { className: 'container py-4' },
-                RE('div', { className: 'flex items-center justify-between' },
-                    RE('h1', { className: 'text-2xl font-semibold' }, 'Create Voting Session'),
-                    RE('a', { 
+    return RE('div', {className: 'min-h-screen'},
+        // Top navigation
+        RE('header', {className: 'border-b'},
+            RE('div', {className: 'container py-4'},
+                RE('div', {className: 'flex items-center justify-between'},
+                    RE('h1', {className: 'text-2xl font-semibold'}, 'Create Voting Session'),
+                    RE('a', {
                         href: '/',
                         className: 'text-sm text-muted-foreground hover:text-foreground'
                     }, '← Back to Home')
@@ -233,84 +234,84 @@ function CreateSessionPage() {
             )
         ),
 
-        // Main Content
-        RE('main', { className: 'container py-8' },
-            RE('div', { className: 'space-y-6' },
-                // Alerts
-                error && RE(Components.Alert, { variant: 'error' }, error),
-                success && RE(Components.Alert, { variant: 'success' }, success),
+        // Form content
+        RE('main', {className: 'container py-8'},
+            RE('div', {className: 'space-y-6'},
+                // Show error/success messages
+                error && RE(Components.Alert, {variant: 'error'}, error),
+                success && RE(Components.Alert, {variant: 'success'}, success),
 
-                // Session Details Section
-                RE('section', { className: 'card' },
-                    RE('div', { className: 'card-header' },
-                        RE('h2', { className: 'card-title' }, 'Session Details')
+                // Basic voting session info
+                RE('section', {className: 'card'},
+                    RE('div', {className: 'card-header'},
+                        RE('h2', {className: 'card-title'}, 'Session Details')
                     ),
-                    RE('div', { className: 'card-content space-y-4' },
-                        // Title
-                        RE(Components.FormGroup, { label: 'Session Title', required: true },
+                    RE('div', {className: 'card-content space-y-4'},
+                        // Session title
+                        RE(Components.FormGroup, {label: 'Session Title', required: true},
                             RE(Components.Input, {
                                 type: 'text',
                                 placeholder: 'e.g., Student Council Elections 2024',
                                 value: sessionData.title,
                                 onChange: (e) => {
                                     setError('');
-                                    setSessionData({ ...sessionData, title: e.target.value });
+                                    setSessionData({...sessionData, title: e.target.value});
                                 }
                             })
                         ),
 
-                        // Description
-                        RE(Components.FormGroup, { label: 'Description (Optional)' },
+                        // Optional description
+                        RE(Components.FormGroup, {label: 'Description (Optional)'},
                             RE(Components.Input, {
                                 type: 'text',
                                 placeholder: 'Describe the purpose of this voting session...',
                                 value: sessionData.description,
-                                onChange: (e) => setSessionData({ ...sessionData, description: e.target.value })
+                                onChange: (e) => setSessionData({...sessionData, description: e.target.value})
                             })
                         ),
 
-                        // Mode Selection
-                        RE(Components.FormGroup, { label: 'Voting Mode', required: true },
-                            RE('div', { className: 'grid md:grid-cols-2 gap-4' },
-                                // Casual Mode
+                        // Choose between open or invite-only voting
+                        RE(Components.FormGroup, {label: 'Voting Mode', required: true},
+                            RE('div', {className: 'grid md:grid-cols-2 gap-4'},
+                                // Anyone can vote with a code
                                 RE('div', {
-                                    className: `radio-item ${sessionData.mode === 'casual' ? 'selected' : ''}`,
-                                    onClick: () => setSessionData({ ...sessionData, mode: 'casual' })
-                                },
+                                        className: `radio-item ${sessionData.mode === 'casual' ? 'selected' : ''}`,
+                                        onClick: () => setSessionData({...sessionData, mode: 'casual'})
+                                    },
                                     RE('input', {
                                         type: 'radio',
                                         name: 'mode',
                                         checked: sessionData.mode === 'casual',
-                                        onChange: () => setSessionData({ ...sessionData, mode: 'casual' })
+                                        onChange: () => setSessionData({...sessionData, mode: 'casual'})
                                     }),
                                     RE('div', {},
-                                        RE('div', { className: 'font-semibold flex items-center gap-2' }, 
+                                        RE('div', {className: 'font-semibold flex items-center gap-2'},
                                             'Casual Mode',
-                                            RE(Components.Badge, { variant: 'secondary' }, 'Quick & Easy')
+                                            RE(Components.Badge, {variant: 'secondary'}, 'Quick & Easy')
                                         ),
-                                        RE('p', { className: 'text-sm text-muted-foreground' }, 
+                                        RE('p', {className: 'text-sm text-muted-foreground'},
                                             'Anyone with the code can vote. Perfect for quick polls.'
                                         )
                                     )
                                 ),
-                                
-                                // Official Mode
+
+                                // Only invited voters
                                 RE('div', {
-                                    className: `radio-item ${sessionData.mode === 'official' ? 'selected' : ''}`,
-                                    onClick: () => setSessionData({ ...sessionData, mode: 'official' })
-                                },
+                                        className: `radio-item ${sessionData.mode === 'official' ? 'selected' : ''}`,
+                                        onClick: () => setSessionData({...sessionData, mode: 'official'})
+                                    },
                                     RE('input', {
                                         type: 'radio',
                                         name: 'mode',
                                         checked: sessionData.mode === 'official',
-                                        onChange: () => setSessionData({ ...sessionData, mode: 'official' })
+                                        onChange: () => setSessionData({...sessionData, mode: 'official'})
                                     }),
                                     RE('div', {},
-                                        RE('div', { className: 'font-semibold flex items-center gap-2' }, 
+                                        RE('div', {className: 'font-semibold flex items-center gap-2'},
                                             'Official Mode',
-                                            RE(Components.Badge, { variant: 'default' }, 'Secure')
+                                            RE(Components.Badge, {variant: 'default'}, 'Secure')
                                         ),
-                                        RE('p', { className: 'text-sm text-muted-foreground' }, 
+                                        RE('p', {className: 'text-sm text-muted-foreground'},
                                             'Only invited voters can participate. Best for elections.'
                                         )
                                     )
@@ -318,42 +319,42 @@ function CreateSessionPage() {
                             )
                         ),
 
-                        // Result Display Option
-                        RE(Components.FormGroup, { label: 'Results Display', required: true },
-                            RE('div', { className: 'grid md:grid-cols-2 gap-4' },
-                                // Real-time Results
+                        // When to reveal results
+                        RE(Components.FormGroup, {label: 'Results Display', required: true},
+                            RE('div', {className: 'grid md:grid-cols-2 gap-4'},
+                                // Show votes as they come in
                                 RE('div', {
-                                    className: `radio-item ${sessionData.resultDisplay === 'realtime' ? 'selected' : ''}`,
-                                    onClick: () => setSessionData({ ...sessionData, resultDisplay: 'realtime' })
-                                },
+                                        className: `radio-item ${sessionData.resultDisplay === 'realtime' ? 'selected' : ''}`,
+                                        onClick: () => setSessionData({...sessionData, resultDisplay: 'realtime'})
+                                    },
                                     RE('input', {
                                         type: 'radio',
                                         name: 'resultDisplay',
                                         checked: sessionData.resultDisplay === 'realtime',
-                                        onChange: () => setSessionData({ ...sessionData, resultDisplay: 'realtime' })
+                                        onChange: () => setSessionData({...sessionData, resultDisplay: 'realtime'})
                                     }),
                                     RE('div', {},
-                                        RE('div', { className: 'font-semibold' }, 'Real-time Results'),
-                                        RE('p', { className: 'text-sm text-muted-foreground' }, 
+                                        RE('div', {className: 'font-semibold'}, 'Real-time Results'),
+                                        RE('p', {className: 'text-sm text-muted-foreground'},
                                             'Results visible while voting is active'
                                         )
                                     )
                                 ),
-                                
-                                // After Closes
+
+                                // Hide until session closes
                                 RE('div', {
-                                    className: `radio-item ${sessionData.resultDisplay === 'after-closes' ? 'selected' : ''}`,
-                                    onClick: () => setSessionData({ ...sessionData, resultDisplay: 'after-closes' })
-                                },
+                                        className: `radio-item ${sessionData.resultDisplay === 'after-closes' ? 'selected' : ''}`,
+                                        onClick: () => setSessionData({...sessionData, resultDisplay: 'after-closes'})
+                                    },
                                     RE('input', {
                                         type: 'radio',
                                         name: 'resultDisplay',
                                         checked: sessionData.resultDisplay === 'after-closes',
-                                        onChange: () => setSessionData({ ...sessionData, resultDisplay: 'after-closes' })
+                                        onChange: () => setSessionData({...sessionData, resultDisplay: 'after-closes'})
                                     }),
                                     RE('div', {},
-                                        RE('div', { className: 'font-semibold' }, 'After Voting Closes'),
-                                        RE('p', { className: 'text-sm text-muted-foreground' }, 
+                                        RE('div', {className: 'font-semibold'}, 'After Voting Closes'),
+                                        RE('p', {className: 'text-sm text-muted-foreground'},
                                             'Results only visible after session closes'
                                         )
                                     )
@@ -361,24 +362,24 @@ function CreateSessionPage() {
                             )
                         ),
 
-                        // Email Import (Official Mode Only)
-                        sessionData.mode === 'official' && RE('div', { className: 'space-y-4' },
-                            RE('div', { className: 'separator' }),
-                            
-                            RE('h3', { className: 'text-lg font-semibold' }, 'Invited Voters'),
-                            
-                            // Text Input
-                            RE(Components.FormGroup, { 
-                                label: 'Paste Emails',
-                                helpText: 'Enter one email per line'
-                            },
+                        // Voter email management (only in official mode)
+                        sessionData.mode === 'official' && RE('div', {className: 'space-y-4'},
+                            RE('div', {className: 'separator'}),
+
+                            RE('h3', {className: 'text-lg font-semibold'}, 'Invited Voters'),
+
+                            // Paste emails directly
+                            RE(Components.FormGroup, {
+                                    label: 'Paste Emails',
+                                    helpText: 'Enter one email per line'
+                                },
                                 RE(Components.Input, {
                                     type: 'text',
                                     placeholder: 'voter1@example.com, voter2@example.com, voter3@example.com',
                                     value: emailInput,
                                     onChange: (e) => setEmailInput(e.target.value)
                                 }),
-                                RE('div', { className: 'flex gap-2 mt-2' },
+                                RE('div', {className: 'flex gap-2 mt-2'},
                                     RE(Components.Button, {
                                         variant: 'secondary',
                                         onClick: addEmailsFromText,
@@ -388,39 +389,39 @@ function CreateSessionPage() {
                                 )
                             ),
 
-                            // CSV Upload
+                            // Upload spreadsheet file
                             RE('div', {},
                                 RE('input', {
                                     ref: fileInputRef,
                                     type: 'file',
                                     accept: '.csv',
                                     onChange: handleCSVUpload,
-                                    style: { display: 'none' }
+                                    style: {display: 'none'}
                                 }),
                                 RE('div', {
-                                    className: 'file-upload',
-                                    onClick: () => fileInputRef.current?.click()
-                                },
-                                    RE('div', { className: 'text-center' },
-                                        RE('p', { className: 'text-sm font-medium' }, 'Import from CSV'),
-                                        RE('p', { className: 'text-xs text-muted-foreground mt-1' }, 
+                                        className: 'file-upload',
+                                        onClick: () => fileInputRef.current?.click()
+                                    },
+                                    RE('div', {className: 'text-center'},
+                                        RE('p', {className: 'text-sm font-medium'}, 'Import from CSV'),
+                                        RE('p', {className: 'text-xs text-muted-foreground mt-1'},
                                             'Click to browse or drag and drop'
                                         )
                                     )
                                 )
                             ),
 
-                            // Email List
+                            // Show added emails as removable tags
                             sessionData.invitedEmails.length > 0 && RE('div', {},
-                                RE('p', { className: 'text-sm font-medium mb-2' }, 
+                                RE('p', {className: 'text-sm font-medium mb-2'},
                                     `${sessionData.invitedEmails.length} voter(s) invited`
                                 ),
-                                RE('div', { className: 'flex flex-wrap gap-2' },
+                                RE('div', {className: 'flex flex-wrap gap-2'},
                                     sessionData.invitedEmails.map(email =>
-                                        RE('span', { 
-                                            key: email,
-                                            className: 'tag'
-                                        },
+                                        RE('span', {
+                                                key: email,
+                                                className: 'tag'
+                                            },
                                             email,
                                             RE('button', {
                                                 onClick: () => removeEmail(email),
@@ -434,24 +435,24 @@ function CreateSessionPage() {
                     )
                 ),
 
-                // Positions & Candidates Section
-                RE('section', { className: 'card' },
-                    RE('div', { className: 'card-header' },
-                        RE('h2', { className: 'card-title' }, 'Positions & Candidates'),
-                        RE('p', { className: 'text-sm text-muted-foreground mt-1' }, 
+                // Add voting positions and candidates
+                RE('section', {className: 'card'},
+                    RE('div', {className: 'card-header'},
+                        RE('h2', {className: 'card-title'}, 'Positions & Candidates'),
+                        RE('p', {className: 'text-sm text-muted-foreground mt-1'},
                             'Add positions and candidates for each position. Each position needs at least 2 candidates.'
                         )
                     ),
-                    RE('div', { className: 'card-content space-y-6' },
-                        // Positions List
+                    RE('div', {className: 'card-content space-y-6'},
+                        // Render each position
                         sessionData.positions.map((position, positionIndex) =>
-                            RE('div', { 
-                                key: position.id,
-                                className: 'panel'
-                            },
-                                // Position Header
-                                RE('div', { className: 'panel-header flex justify-between items-start' },
-                                    RE('h4', { className: 'font-semibold text-lg' }, 
+                            RE('div', {
+                                    key: position.id,
+                                    className: 'panel'
+                                },
+                                // Position title and delete button
+                                RE('div', {className: 'panel-header flex justify-between items-start'},
+                                    RE('h4', {className: 'font-semibold text-lg'},
                                         `Position ${positionIndex + 1}`
                                     ),
                                     sessionData.positions.length > 1 && RE(Components.Button, {
@@ -460,11 +461,11 @@ function CreateSessionPage() {
                                         onClick: () => removePosition(positionIndex)
                                     }, 'Remove Position')
                                 ),
-                                
-                                RE('div', { className: 'panel-content space-y-4' },
-                                    // Position Details
-                                    RE('div', { className: 'grid md:grid-cols-3 gap-3' },
-                                        RE('div', { className: 'space-y-2' },
+
+                                RE('div', {className: 'panel-content space-y-4'},
+                                    // Position name and number of seats
+                                    RE('div', {className: 'grid md:grid-cols-3 gap-3'},
+                                        RE('div', {className: 'space-y-2'},
                                             RE(Components.Label, {}, 'Position Title *'),
                                             RE(Components.Input, {
                                                 type: 'text',
@@ -475,7 +476,7 @@ function CreateSessionPage() {
                                                 'data-position-title': positionIndex
                                             })
                                         ),
-                                        RE('div', { className: 'space-y-2' },
+                                        RE('div', {className: 'space-y-2'},
                                             RE(Components.Label, {}, 'Seats Available'),
                                             RE(Components.Input, {
                                                 type: 'number',
@@ -484,7 +485,7 @@ function CreateSessionPage() {
                                                 onChange: (e) => updatePosition(positionIndex, 'maxSelections', parseInt(e.target.value) || 1)
                                             })
                                         ),
-                                        RE('div', { className: 'space-y-2' },
+                                        RE('div', {className: 'space-y-2'},
                                             RE(Components.Label, {}, 'Description'),
                                             RE(Components.Input, {
                                                 type: 'text',
@@ -495,24 +496,24 @@ function CreateSessionPage() {
                                         )
                                     ),
 
-                                    // Candidates Section
-                                    RE('div', { className: 'space-y-3' },
-                                        RE('div', { className: 'flex justify-end items-center' },
+                                    // Candidates for this position
+                                    RE('div', {className: 'space-y-3'},
+                                        RE('div', {className: 'flex justify-end items-center'},
                                             RE(Components.Button, {
                                                 variant: 'outline',
                                                 className: 'btn-sm',
                                                 onClick: () => addCandidate(positionIndex)
                                             }, '+ Add Candidate')
                                         ),
-                                        
-                                        // Candidates List
+
+                                        // List of candidates
                                         position.candidates.map((candidate, candidateIndex) =>
-                                            RE('div', { 
-                                                key: candidate.id,
-                                                className: 'card space-y-3'
-                                            },
-                                                RE('div', { className: 'flex justify-between items-start' },
-                                                    RE('h5', { className: 'font-medium' }, 
+                                            RE('div', {
+                                                    key: candidate.id,
+                                                    className: 'card space-y-3'
+                                                },
+                                                RE('div', {className: 'flex justify-between items-start'},
+                                                    RE('h5', {className: 'font-medium'},
                                                         `Candidate ${position.candidates.length - candidateIndex}`
                                                     ),
                                                     RE(Components.Button, {
@@ -521,8 +522,8 @@ function CreateSessionPage() {
                                                         onClick: () => removeCandidate(positionIndex, candidateIndex)
                                                     }, 'Remove')
                                                 ),
-                                                RE('div', { className: 'grid md:grid-cols-2 gap-3' },
-                                                    RE('div', { className: 'space-y-2' },
+                                                RE('div', {className: 'grid md:grid-cols-2 gap-3'},
+                                                    RE('div', {className: 'space-y-2'},
                                                         RE(Components.Label, {}, 'Name *'),
                                                         RE(Components.Input, {
                                                             type: 'text',
@@ -533,7 +534,7 @@ function CreateSessionPage() {
                                                             'data-candidate-name': `${positionIndex}-${candidateIndex}`
                                                         })
                                                     ),
-                                                    RE('div', { className: 'space-y-2' },
+                                                    RE('div', {className: 'space-y-2'},
                                                         RE(Components.Label, {}, 'Image URL'),
                                                         RE(Components.Input, {
                                                             type: 'url',
@@ -543,7 +544,7 @@ function CreateSessionPage() {
                                                         })
                                                     )
                                                 ),
-                                                RE('div', { className: 'space-y-2' },
+                                                RE('div', {className: 'space-y-2'},
                                                     RE(Components.Label, {}, 'Bio'),
                                                     RE(Components.Input, {
                                                         type: 'text',
@@ -558,8 +559,8 @@ function CreateSessionPage() {
                                 )
                             )
                         ),
-                        
-                        // Add Position Button
+
+                        // Add new voting position
                         RE(Components.Button, {
                             variant: 'outline',
                             className: 'w-full',
@@ -568,8 +569,8 @@ function CreateSessionPage() {
                     )
                 ),
 
-                // Create Button
-                RE('div', { className: 'flex justify-end gap-4' },
+                // Bottom buttons: Cancel and Create
+                RE('div', {className: 'flex justify-end gap-4'},
                     RE(Components.Button, {
                         variant: 'outline',
                         onClick: () => window.location.href = '/'
@@ -585,8 +586,6 @@ function CreateSessionPage() {
     );
 }
 
-// ============================================
-// RENDER APP
-// ============================================
+// Mount and render the React component
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(RE(CreateSessionPage));
