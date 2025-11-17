@@ -2,6 +2,8 @@
 
 const { useState, useEffect } = React;
 
+const RE = React.createElement;
+
 function ResultsPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
@@ -81,17 +83,17 @@ function ResultsPage() {
     };
 
     if (loading) {
-        return React.createElement('div', { className: 'min-h-screen flex items-center justify-center' },
-            React.createElement(Components.Loading)
+        return RE('div', { className: 'min-h-screen flex items-center justify-center' },
+            RE(Components.Loading)
         );
     }
 
     if (error) {
-        return React.createElement('div', { className: 'min-h-screen flex items-center justify-center' },
-            React.createElement('div', { className: 'container' },
-                React.createElement(Components.Alert, { variant: 'error' }, error),
-                React.createElement('div', { className: 'text-center mt-4' },
-                    React.createElement(Components.Button, {
+        return RE('div', { className: 'min-h-screen flex items-center justify-center' },
+            RE('div', { className: 'container' },
+                RE(Components.Alert, { variant: 'error' }, error),
+                RE('div', { className: 'text-center mt-4' },
+                    RE(Components.Button, {
                         onClick: () => window.location.href = '/'
                     }, 'Back to Home')
                 )
@@ -103,23 +105,23 @@ function ResultsPage() {
     const shouldHideResults = sessionData?.resultDisplay === 'after-closes' && sessionData?.isActive === 1;
 
     if (shouldHideResults) {
-        return React.createElement('div', { className: 'min-h-screen flex items-center justify-center' },
-            React.createElement('div', { className: 'container text-center' },
-                React.createElement(Components.Card, {},
-                    React.createElement('div', { className: 'p-8' },
-                        React.createElement('h2', { className: 'text-2xl font-semibold mb-4' }, sessionData.title),
-                        React.createElement(Components.Alert, { variant: 'info' }, 
+        return RE('div', { className: 'min-h-screen flex items-center justify-center' },
+            RE('div', { className: 'container text-center' },
+                RE(Components.Card, {},
+                    RE('div', { className: 'p-8' },
+                        RE('h2', { className: 'text-2xl font-semibold mb-4' }, sessionData.title),
+                        RE(Components.Alert, { variant: 'info' }, 
                             'Results will be available after voting closes.'
                         ),
-                        React.createElement('p', { className: 'text-sm text-muted-foreground mt-4' },
+                        RE('p', { className: 'text-sm text-muted-foreground mt-4' },
                             'The session creator has set results to be visible only after voting is closed.'
                         ),
-                        React.createElement('div', { className: 'mt-6 flex items-center justify-center gap-3' },
-                            React.createElement(Components.Button, {
+                        RE('div', { className: 'mt-6 flex items-center justify-center gap-3' },
+                            RE(Components.Button, {
                                 onClick: fetchResults,
                                 variant: 'outline'
                             }, 'Check Again'),
-                            React.createElement(Components.Button, {
+                            RE(Components.Button, {
                                 onClick: () => window.location.href = '/',
                                 variant: 'ghost'
                             }, 'Back to Home')
@@ -130,16 +132,16 @@ function ResultsPage() {
         );
     }
 
-    return React.createElement('div', { className: 'min-h-screen' },
+    return RE('div', { className: 'min-h-screen' },
         // Header
-        React.createElement('header', { className: 'border-b' },
-            React.createElement('div', { className: 'container py-4' },
-                React.createElement('div', { className: 'flex items-center justify-between' },
-                    React.createElement('div', {},
-                        React.createElement('h1', { className: 'text-2xl font-semibold' }, 'Voting Results'),
-                        React.createElement('p', { className: 'text-sm text-muted-foreground mt-1' }, sessionData.title)
+        RE('header', { className: 'border-b' },
+            RE('div', { className: 'container py-4' },
+                RE('div', { className: 'flex items-center justify-between' },
+                    RE('div', {},
+                        RE('h1', { className: 'text-2xl font-semibold' }, 'Voting Results'),
+                        RE('p', { className: 'text-sm text-muted-foreground mt-1' }, sessionData.title)
                     ),
-                    React.createElement('a', { 
+                    RE('a', { 
                         href: '/',
                         className: 'text-sm text-muted-foreground hover:text-foreground'
                     }, 'Back to Home')
@@ -148,32 +150,32 @@ function ResultsPage() {
         ),
 
         // Main Content
-        React.createElement('main', { className: 'container py-8' },
-            React.createElement('div', { className: 'space-y-6' },
+        RE('main', { className: 'container py-8' },
+            RE('div', { className: 'space-y-6' },
                 // Session Info
-                React.createElement('div', { className: 'card' },
-                    React.createElement('div', { className: 'card-content p-6' },
-                        React.createElement('div', { className: 'flex items-center justify-between' },
-                            React.createElement('div', {},
-                                React.createElement('h2', { className: 'text-lg font-semibold mb-2' }, sessionData.title),
-                                sessionData.description && React.createElement('p', { className: 'text-sm text-muted-foreground' }, sessionData.description)
+                RE('div', { className: 'card' },
+                    RE('div', { className: 'card-content p-6' },
+                        RE('div', { className: 'flex items-center justify-between' },
+                            RE('div', {},
+                                RE('h2', { className: 'text-lg font-semibold mb-2' }, sessionData.title),
+                                sessionData.description && RE('p', { className: 'text-sm text-muted-foreground' }, sessionData.description)
                             ),
-                            React.createElement(Components.Badge, { 
+                            RE(Components.Badge, { 
                                 variant: sessionData.isActive ? 'default' : 'secondary' 
                             }, sessionData.isActive ? 'Active' : 'Closed')
                         ),
-                        React.createElement('div', { className: 'grid md:grid-cols-3 gap-4 mt-6 pt-6 border-t' },
-                            React.createElement('div', {},
-                                React.createElement('div', { className: 'text-2xl font-bold' }, stats.totalVotes),
-                                React.createElement('div', { className: 'text-sm text-muted-foreground' }, 'Total Votes')
+                        RE('div', { className: 'grid md:grid-cols-3 gap-4 mt-6 pt-6 border-t' },
+                            RE('div', {},
+                                RE('div', { className: 'text-2xl font-bold' }, stats.totalVotes),
+                                RE('div', { className: 'text-sm text-muted-foreground' }, 'Total Votes')
                             ),
-                            React.createElement('div', {},
-                                React.createElement('div', { className: 'text-2xl font-bold' }, positions.length),
-                                React.createElement('div', { className: 'text-sm text-muted-foreground' }, 'Positions')
+                            RE('div', {},
+                                RE('div', { className: 'text-2xl font-bold' }, positions.length),
+                                RE('div', { className: 'text-sm text-muted-foreground' }, 'Positions')
                             ),
-                            stats.turnoutPercentage !== null && React.createElement('div', {},
-                                React.createElement('div', { className: 'text-2xl font-bold' }, `${stats.turnoutPercentage}%`),
-                                React.createElement('div', { className: 'text-sm text-muted-foreground' }, 
+                            stats.turnoutPercentage !== null && RE('div', {},
+                                RE('div', { className: 'text-2xl font-bold' }, `${stats.turnoutPercentage}%`),
+                                RE('div', { className: 'text-sm text-muted-foreground' }, 
                                     `Turnout (${stats.totalVotes}/${stats.totalInvited})`
                                 )
                             )
@@ -186,64 +188,64 @@ function ResultsPage() {
                     const winners = getWinners(position);
                     const totalVotesForPosition = position.candidates.reduce((sum, c) => sum + c.voteCount, 0);
 
-                    return React.createElement('div', { 
+                    return RE('div', { 
                         key: position.id,
                         className: 'card'
                     },
-                        React.createElement('div', { className: 'card-header' },
-                            React.createElement('div', { className: 'flex items-start justify-between' },
-                                React.createElement('div', {},
-                                    React.createElement('h3', { className: 'card-title' }, position.title),
-                                    position.description && React.createElement('p', { className: 'card-description' }, position.description)
+                        RE('div', { className: 'card-header' },
+                            RE('div', { className: 'flex items-start justify-between' },
+                                RE('div', {},
+                                    RE('h3', { className: 'card-title' }, position.title),
+                                    position.description && RE('p', { className: 'card-description' }, position.description)
                                 ),
-                                React.createElement('div', { className: 'flex gap-2' },
-                                    React.createElement(Components.Badge, { variant: 'secondary' }, 
+                                RE('div', { className: 'flex gap-2' },
+                                    RE(Components.Badge, { variant: 'secondary' }, 
                                         `${position.candidates.length} candidates`
                                     ),
-                                    React.createElement(Components.Badge, { variant: 'outline' }, 
+                                    RE(Components.Badge, { variant: 'outline' }, 
                                         `${totalVotesForPosition} votes`
                                     )
                                 )
                             )
                         ),
-                        React.createElement('div', { className: 'card-content space-y-3' },
+                        RE('div', { className: 'card-content space-y-3' },
                             position.candidates
                                 .sort((a, b) => b.voteCount - a.voteCount)
                                 .map(candidate => {
                                     const percentage = getPercentage(candidate.voteCount, totalVotesForPosition);
                                     const isWinner = winners.some(w => w.id === candidate.id) && candidate.voteCount > 0;
 
-                                    return React.createElement('div', { 
+                                    return RE('div', { 
                                         key: candidate.id,
                                         className: `border rounded-lg p-4 ${isWinner ? 'border-primary bg-accent' : ''}`
                                     },
-                                        React.createElement('div', { className: 'flex items-start gap-3' },
-                                            candidate.photoUrl && React.createElement('img', {
+                                        RE('div', { className: 'flex items-start gap-3' },
+                                            candidate.photoUrl && RE('img', {
                                                 src: candidate.photoUrl,
                                                 alt: candidate.name,
                                                 className: 'w-16 h-16 rounded-full object-cover',
                                                 onError: (e) => { e.target.style.display = 'none'; }
                                             }),
-                                            React.createElement('div', { className: 'flex-1' },
-                                                React.createElement('div', { className: 'flex items-center gap-2 mb-2' },
-                                                    React.createElement('h4', { className: 'font-semibold text-lg' }, candidate.name),
-                                                    isWinner && React.createElement(Components.Badge, { variant: 'default' }, 'Leading')
+                                            RE('div', { className: 'flex-1' },
+                                                RE('div', { className: 'flex items-center gap-2 mb-2' },
+                                                    RE('h4', { className: 'font-semibold text-lg' }, candidate.name),
+                                                    isWinner && RE(Components.Badge, { variant: 'default' }, 'Leading')
                                                 ),
-                                                candidate.description && React.createElement('p', { className: 'text-sm text-muted-foreground mb-3' }, 
+                                                candidate.description && RE('p', { className: 'text-sm text-muted-foreground mb-3' }, 
                                                     candidate.description
                                                 ),
                                                 // Vote bar
-                                                React.createElement('div', { className: 'space-y-2' },
-                                                    React.createElement('div', { className: 'flex items-center justify-between text-sm' },
-                                                        React.createElement('span', { className: 'font-medium' }, 
+                                                RE('div', { className: 'space-y-2' },
+                                                    RE('div', { className: 'flex items-center justify-between text-sm' },
+                                                        RE('span', { className: 'font-medium' }, 
                                                             `${candidate.voteCount} vote${candidate.voteCount !== 1 ? 's' : ''}`
                                                         ),
-                                                        React.createElement('span', { className: 'text-muted-foreground' }, 
+                                                        RE('span', { className: 'text-muted-foreground' }, 
                                                             `${percentage}%`
                                                         )
                                                     ),
-                                                    React.createElement('div', { className: 'w-full bg-muted rounded-full h-2' },
-                                                        React.createElement('div', {
+                                                    RE('div', { className: 'w-full bg-muted rounded-full h-2' },
+                                                        RE('div', {
                                                             className: `h-full rounded-full transition-all ${isWinner ? 'bg-primary' : 'bg-secondary'}`,
                                                             style: { width: `${percentage}%` }
                                                         })
@@ -263,4 +265,4 @@ function ResultsPage() {
 
 // Render
 const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(React.createElement(ResultsPage));
+root.render(RE(ResultsPage));

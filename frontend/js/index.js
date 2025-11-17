@@ -2,6 +2,8 @@
 
 const { useState } = React;
 
+const RE = React.createElement;
+
 function HomePage() {
   const [showJoinDialog, setShowJoinDialog] = useState(false);
   const [joinCode, setJoinCode] = useState('');
@@ -16,32 +18,32 @@ function HomePage() {
     window.location.href = 'create.html';
   };
 
-  return React.createElement('div', { className: 'min-h-screen flex items-center justify-center' },
-    React.createElement('div', { className: 'container' },
-      React.createElement('div', { className: 'text-center space-y-8' },
+  return RE('div', { className: 'min-h-screen flex items-center justify-center' },
+    RE('div', { className: 'container' },
+      RE('div', { className: 'text-center space-y-8' },
         // Hero section
-        React.createElement('div', { className: 'space-y-4' },
-          React.createElement('h1', { 
+        RE('div', { className: 'space-y-4' },
+          RE('h1', { 
             className: 'text-3xl md:text-4xl font-bold',
             style: { fontSize: '3rem' }
           }, 'Quick-Open Vote'),
-          React.createElement('p', { 
+          RE('p', { 
             className: 'text-xl text-muted-foreground'
           }, 'Democratic Voting Made Simple')
         ),
         
         // Main action buttons
-        React.createElement('div', { 
+        RE('div', { 
           className: 'flex flex-col sm:flex-row gap-4 items-center justify-center',
           style: { marginTop: '3rem' }
         },
-          React.createElement(Components.Button, {
+          RE(Components.Button, {
             onClick: handleCreate,
             className: 'btn btn-primary btn-lg',
             style: { width: 'fit-content' }
           }, 'Create Voting Session'),
           
-          React.createElement(Components.Button, {
+          RE(Components.Button, {
             onClick: () => setShowJoinDialog(true),
             className: 'btn btn-outline btn-lg',
             style: { width: 'fit-content' }
@@ -49,22 +51,22 @@ function HomePage() {
         ),
         
         // Feature cards
-        React.createElement('div', { 
+        RE('div', { 
           className: 'grid md:grid-cols-2 gap-6',
           style: { marginTop: '4rem', maxWidth: '600px', margin: '4rem auto 0' }
         },
-          React.createElement('div', { className: 'card' },
-            React.createElement('div', { className: 'card-content p-6 text-center' },
-              React.createElement('h3', { className: 'font-semibold mb-2' }, 'Official Mode'),
-              React.createElement('p', { className: 'text-sm text-muted-foreground' }, 
+          RE('div', { className: 'card' },
+            RE('div', { className: 'card-content p-6 text-center' },
+              RE('h3', { className: 'font-semibold mb-2' }, 'Official Mode'),
+              RE('p', { className: 'text-sm text-muted-foreground' }, 
                 'Private voting with email invitations'
               )
             )
           ),
-          React.createElement('div', { className: 'card' },
-            React.createElement('div', { className: 'card-content p-6 text-center' },
-              React.createElement('h3', { className: 'font-semibold mb-2' }, 'Casual Mode'),
-              React.createElement('p', { className: 'text-sm text-muted-foreground' }, 
+          RE('div', { className: 'card' },
+            RE('div', { className: 'card-content p-6 text-center' },
+              RE('h3', { className: 'font-semibold mb-2' }, 'Casual Mode'),
+              RE('p', { className: 'text-sm text-muted-foreground' }, 
                 'Open voting with shareable codes'
               )
             )
@@ -74,21 +76,21 @@ function HomePage() {
     ),
     
     // Join dialog
-    showJoinDialog && React.createElement('div', {},
-      React.createElement('div', { 
+    showJoinDialog && RE('div', {},
+      RE('div', { 
         className: 'dialog-overlay',
         onClick: () => setShowJoinDialog(false)
       }),
-      React.createElement('div', { className: 'dialog-content' },
-        React.createElement('div', { className: 'dialog-header' },
-          React.createElement('h2', { className: 'dialog-title' }, 'Join Voting Session'),
-          React.createElement('p', { className: 'dialog-description' }, 
+      RE('div', { className: 'dialog-content' },
+        RE('div', { className: 'dialog-header' },
+          RE('h2', { className: 'dialog-title' }, 'Join Voting Session'),
+          RE('p', { className: 'dialog-description' }, 
             'Enter the session code to participate'
           )
         ),
-        React.createElement('div', { className: 'dialog-body' },
-          React.createElement(FormGroup, { label: 'Session Code' },
-            React.createElement(Input, {
+        RE('div', { className: 'dialog-body' },
+          RE(FormGroup, { label: 'Session Code' },
+            RE(Input, {
               type: 'text',
               placeholder: 'Enter code...',
               value: joinCode,
@@ -98,12 +100,12 @@ function HomePage() {
             })
           )
         ),
-        React.createElement('div', { className: 'dialog-footer' },
-          React.createElement(Components.Button, {
+        RE('div', { className: 'dialog-footer' },
+          RE(Components.Button, {
             onClick: () => setShowJoinDialog(false),
             className: 'btn btn-outline'
           }, 'Cancel'),
-          React.createElement(Components.Button, {
+          RE(Components.Button, {
             onClick: handleJoin,
             className: 'btn btn-primary',
             disabled: !joinCode.trim()
@@ -116,4 +118,4 @@ function HomePage() {
 
 // Render
 const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(React.createElement(HomePage));
+root.render(RE(HomePage));

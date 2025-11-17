@@ -2,6 +2,8 @@
 
 const { useState, useEffect } = React;
 
+const RE = React.createElement;
+
 function VotingPage() {
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
@@ -155,17 +157,17 @@ function VotingPage() {
     };
 
     if (loading) {
-        return React.createElement('div', { className: 'min-h-screen flex items-center justify-center' },
-            React.createElement(Components.Loading, {}, 'Loading voting session...')
+        return RE('div', { className: 'min-h-screen flex items-center justify-center' },
+            RE(Components.Loading, {}, 'Loading voting session...')
         );
     }
 
     if (error && !session) {
-        return React.createElement('div', { className: 'min-h-screen flex items-center justify-center' },
-            React.createElement('div', { className: 'container text-center' },
-                React.createElement(Components.Alert, { variant: 'error' }, error),
-                React.createElement('div', { className: 'mt-4' },
-                    React.createElement(Components.Button, {
+        return RE('div', { className: 'min-h-screen flex items-center justify-center' },
+            RE('div', { className: 'container text-center' },
+                RE(Components.Alert, { variant: 'error' }, error),
+                RE('div', { className: 'mt-4' },
+                    RE(Components.Button, {
                         onClick: () => window.location.href = '/'
                     }, 'Back to Home')
                 )
@@ -173,19 +175,19 @@ function VotingPage() {
         );
     }
 
-    return React.createElement('div', { className: 'min-h-screen' },
+    return RE('div', { className: 'min-h-screen' },
         // Header
-        React.createElement('header', { className: 'border-b' },
-            React.createElement('div', { className: 'container py-4' },
-                React.createElement('div', { className: 'flex items-center justify-between' },
-                    React.createElement('div', {},
-                        React.createElement('h1', { className: 'text-2xl font-semibold' }, session.title),
-                        session.description && React.createElement('p', { 
+        RE('header', { className: 'border-b' },
+            RE('div', { className: 'container py-4' },
+                RE('div', { className: 'flex items-center justify-between' },
+                    RE('div', {},
+                        RE('h1', { className: 'text-2xl font-semibold' }, session.title),
+                        session.description && RE('p', { 
                             className: 'text-sm text-muted-foreground mt-1' 
                         }, session.description)
                     ),
-                    React.createElement('div', { className: 'flex items-center gap-2' },
-                        React.createElement(Components.Badge, { variant: 'default' }, 
+                    RE('div', { className: 'flex items-center gap-2' },
+                        RE(Components.Badge, { variant: 'default' }, 
                             session.mode === 'official' ? 'Official Vote' : 'Casual Vote'
                         )
                     )
@@ -194,27 +196,27 @@ function VotingPage() {
         ),
 
         // Main Content
-        React.createElement('main', { className: 'container py-8' },
-            React.createElement('div', { className: 'space-y-6' },
+        RE('main', { className: 'container py-8' },
+            RE('div', { className: 'space-y-6' },
                 // Alerts
-                error && React.createElement(Components.Alert, { variant: 'error' }, error),
-                success && React.createElement(Components.Alert, { variant: 'success' }, success),
+                error && RE(Components.Alert, { variant: 'error' }, error),
+                success && RE(Components.Alert, { variant: 'success' }, success),
 
                 // Email Input (Official Mode Only)
-                session.mode === 'official' && !success && React.createElement('section', { className: 'card' },
-                    React.createElement('div', { className: 'card-header' },
-                        React.createElement('h2', { className: 'card-title' }, 'Voter Information')
+                session.mode === 'official' && !success && RE('section', { className: 'card' },
+                    RE('div', { className: 'card-header' },
+                        RE('h2', { className: 'card-title' }, 'Voter Information')
                     ),
-                    React.createElement('div', { className: 'card-content' },
-                        React.createElement('div', { className: 'space-y-2' },
-                            React.createElement(Components.Label, {}, 'Your Email Address *'),
-                            React.createElement(Components.Input, {
+                    RE('div', { className: 'card-content' },
+                        RE('div', { className: 'space-y-2' },
+                            RE(Components.Label, {}, 'Your Email Address *'),
+                            RE(Components.Input, {
                                 type: 'email',
                                 placeholder: 'your.email@example.com',
                                 value: voterEmail,
                                 onChange: (e) => setVoterEmail(e.target.value)
                             }),
-                            React.createElement('p', { className: 'text-xs text-muted-foreground' },
+                            RE('p', { className: 'text-xs text-muted-foreground' },
                                 'This email must be on the invited voters list'
                             )
                         )
@@ -222,20 +224,20 @@ function VotingPage() {
                 ),
 
                 // Name Input (Casual Mode Only)
-                session.mode === 'casual' && !success && React.createElement('section', { className: 'card' },
-                    React.createElement('div', { className: 'card-header' },
-                        React.createElement('h2', { className: 'card-title' }, 'Voter Information')
+                session.mode === 'casual' && !success && RE('section', { className: 'card' },
+                    RE('div', { className: 'card-header' },
+                        RE('h2', { className: 'card-title' }, 'Voter Information')
                     ),
-                    React.createElement('div', { className: 'card-content' },
-                        React.createElement('div', { className: 'space-y-2' },
-                            React.createElement(Components.Label, {}, 'Your Name (Optional)'),
-                            React.createElement(Components.Input, {
+                    RE('div', { className: 'card-content' },
+                        RE('div', { className: 'space-y-2' },
+                            RE(Components.Label, {}, 'Your Name (Optional)'),
+                            RE(Components.Input, {
                                 type: 'text',
                                 placeholder: 'Enter your name',
                                 value: voterName,
                                 onChange: (e) => setVoterName(e.target.value)
                             }),
-                            React.createElement('p', { className: 'text-xs text-muted-foreground' },
+                            RE('p', { className: 'text-xs text-muted-foreground' },
                                 'Optional: Help identify your vote in the results'
                             )
                         )
@@ -244,37 +246,37 @@ function VotingPage() {
 
                 // Positions and Candidates
                 !success && positions.map(position =>
-                    React.createElement('section', { 
+                    RE('section', { 
                         key: position.id,
                         className: 'card'
                     },
-                        React.createElement('div', { className: 'card-header' },
-                            React.createElement('div', { className: 'flex items-start justify-between' },
-                                React.createElement('div', {},
-                                    React.createElement('h2', { className: 'card-title' }, position.title),
-                                    position.description && React.createElement('p', { 
+                        RE('div', { className: 'card-header' },
+                            RE('div', { className: 'flex items-start justify-between' },
+                                RE('div', {},
+                                    RE('h2', { className: 'card-title' }, position.title),
+                                    position.description && RE('p', { 
                                         className: 'text-sm text-muted-foreground mt-1' 
                                     }, position.description)
                                 ),
-                                React.createElement(Components.Badge, { variant: 'outline' },
+                                RE(Components.Badge, { variant: 'outline' },
                                     `Select ${position.maxSelections} candidate${position.maxSelections > 1 ? 's' : ''}`
                                 )
                             )
                         ),
-                        React.createElement('div', { className: 'card-content' },
-                            React.createElement('div', { className: 'space-y-3' },
+                        RE('div', { className: 'card-content' },
+                            RE('div', { className: 'space-y-3' },
                                 position.candidates.map(candidate => {
                                     const isSelected = (votes[position.id] || []).includes(candidate.id);
                                     
-                                    return React.createElement('div', {
+                                    return RE('div', {
                                         key: candidate.id,
                                         className: `card cursor-pointer transition-all ${isSelected ? 'ring-2 ring-primary bg-accent' : 'hover:bg-muted/50'}`,
                                         onClick: () => toggleCandidate(position.id, candidate.id, position.maxSelections)
                                     },
-                                        React.createElement('div', { className: 'flex items-center gap-4' },
+                                        RE('div', { className: 'flex items-center gap-4' },
                                             // Checkbox
-                                            React.createElement('div', { className: 'flex-shrink-0' },
-                                                React.createElement('input', {
+                                            RE('div', { className: 'flex-shrink-0' },
+                                                RE('input', {
                                                     type: position.maxSelections > 1 ? 'checkbox' : 'radio',
                                                     checked: isSelected,
                                                     onChange: () => {}, // Handled by card click
@@ -283,20 +285,20 @@ function VotingPage() {
                                             ),
                                             
                                             // Info
-                                            React.createElement('div', { className: 'flex-1 min-w-0' },
-                                                React.createElement('div', { className: 'font-semibold text-base' }, 
+                                            RE('div', { className: 'flex-1 min-w-0' },
+                                                RE('div', { className: 'font-semibold text-base' }, 
                                                     candidate.name
                                                 ),
-                                                candidate.description && React.createElement('p', { 
+                                                candidate.description && RE('p', { 
                                                     className: 'text-sm text-muted-foreground mt-1'
                                                 }, candidate.description)
                                             ),
                                             
                                             // Selected indicator
-                                            isSelected && React.createElement('div', { 
+                                            isSelected && RE('div', { 
                                                 className: 'flex-shrink-0'
                                             },
-                                                React.createElement(Components.Badge, { variant: 'default' }, 'Selected')
+                                                RE(Components.Badge, { variant: 'default' }, 'Selected')
                                             )
                                         )
                                     );
@@ -307,8 +309,8 @@ function VotingPage() {
                 ),
 
                 // Submit Button
-                !success && React.createElement('div', { className: 'flex justify-center' },
-                    React.createElement(Components.Button, {
+                !success && RE('div', { className: 'flex justify-center' },
+                    RE(Components.Button, {
                         onClick: submitVotes,
                         disabled: submitting,
                         className: 'btn-lg'
@@ -321,4 +323,4 @@ function VotingPage() {
 
 // Render app
 const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(React.createElement(VotingPage));
+root.render(RE(VotingPage));
