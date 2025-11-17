@@ -185,6 +185,14 @@ p {
     height: 100%;
 }
 
+.h-1\.5 {
+    height: 0.375rem;
+}
+
+.h-2 {
+    height: 0.5rem;
+}
+
 .min-h-screen {
     min-height: 100vh;
 }
@@ -352,6 +360,7 @@ p {
     outline: none;
     padding: 0.5rem 1rem;
     height: 2.5rem;
+    text-decoration: none;
 }
 
 .btn:focus-visible {
@@ -390,6 +399,7 @@ p {
 .btn-destructive:hover:not(:disabled) {
     background-color: hsl(var(--destructive) / 0.9);
 }
+
 
 .btn-outline {
     border: 1px solid hsl(var(--input));
@@ -430,6 +440,48 @@ p {
     border-radius: calc(var(--radius) + 2px);
     border: 1px solid hsl(var(--border));
     box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+}
+
+.candidate-card {
+    padding: 1rem;
+    border-radius: var(--radius);
+    border: 1px solid hsl(var(--border));
+    background-color: hsl(var(--card));
+    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+}
+
+.candidate-card h5 {
+    margin: 0;
+    font-size: 1rem;
+    letter-spacing: 0.01em;
+    color: hsl(var(--foreground));
+}
+
+/* Professional candidate photo styling */
+.candidate-photo {
+    width: 3rem;
+    height: 3rem;
+    min-width: 3rem;
+    min-height: 3rem;
+    border-radius: 50%;
+    object-fit: cover;
+    object-position: center;
+    border: 2px solid hsl(var(--border));
+    box-shadow: 0 2px 4px 0 rgb(0 0 0 / 0.1);
+    background-color: hsl(var(--muted));
+}
+
+.candidate-photo-large {
+    width: 3.5rem;
+    height: 3.5rem;
+    min-width: 3.5rem;
+    min-height: 3.5rem;
+    border-radius: 50%;
+    object-fit: cover;
+    object-position: center;
+    border: 2px solid hsl(var(--border));
+    box-shadow: 0 2px 8px 0 rgb(0 0 0 / 0.12);
+    background-color: hsl(var(--muted));
 }
 
 .card-header {
@@ -902,6 +954,10 @@ textarea.input {
     background-color: rgb(229 231 235);
 }
 
+.bg-gray-300 {
+    background-color: rgb(209 213 219);
+}
+
 .bg-green-50 {
     background-color: rgb(240 253 244);
 }
@@ -932,6 +988,18 @@ textarea.input {
 
 .text-blue-800 {
     color: rgb(30 64 175);
+}
+
+.bg-muted {
+    background-color: hsl(var(--muted));
+}
+
+.bg-primary {
+    background-color: hsl(var(--primary));
+}
+
+.bg-secondary {
+    background-color: hsl(var(--secondary));
 }
 
 .text-blue-700 {

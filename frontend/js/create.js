@@ -229,7 +229,7 @@ function CreateSessionPage() {
                     RE('a', {
                         href: '/',
                         className: 'text-sm text-muted-foreground hover:text-foreground'
-                    }, '← Back to Home')
+                    }, 'Back to Home')
                 )
             )
         ),
@@ -456,8 +456,8 @@ function CreateSessionPage() {
                                         `Position ${positionIndex + 1}`
                                     ),
                                     sessionData.positions.length > 1 && RE(Components.Button, {
-                                        variant: 'ghost',
-                                        className: 'btn-sm',
+                                        variant: 'destructive',
+                                        size: 'sm',
                                         onClick: () => removePosition(positionIndex)
                                     }, 'Remove Position')
                                 ),
@@ -510,15 +510,15 @@ function CreateSessionPage() {
                                         position.candidates.map((candidate, candidateIndex) =>
                                             RE('div', {
                                                     key: candidate.id,
-                                                    className: 'card space-y-3'
+                                                    className: 'card candidate-card space-y-3'
                                                 },
                                                 RE('div', {className: 'flex justify-between items-start'},
                                                     RE('h5', {className: 'font-medium'},
                                                         `Candidate ${position.candidates.length - candidateIndex}`
                                                     ),
                                                     RE(Components.Button, {
-                                                        variant: 'ghost',
-                                                        className: 'btn-sm',
+                                                        variant: 'destructive',
+                                                        size: 'sm',
                                                         onClick: () => removeCandidate(positionIndex, candidateIndex)
                                                     }, 'Remove')
                                                 ),

@@ -33,14 +33,23 @@ function initDatabase() {
             // Already exists, skip
         }
 
-        // Migrate existing databases: add votedAt to InvitedVoter if missing
+        // Migrate existing databases: add votedAt/createdAt to InvitedVoter if missing
         try {
             const invitedVoterInfo = db.pragma('table_info(InvitedVoter)');
             const hasVotedAt = invitedVoterInfo.some(col => col.name === 'votedAt');
+            const hasCreatedAt = invitedVoterInfo.some(col => col.name === 'createdAt');
 
             if (!hasVotedAt) {
                 db.exec(`ALTER TABLE InvitedVoter
                     ADD COLUMN votedAt TEXT`);
+            }
+
+            if (!hasCreatedAt) {
+                db.exec(`ALTER TABLE InvitedVoter
+                    ADD COLUMN createdAt TEXT`);
+                db.exec(`UPDATE InvitedVoter
+                    SET createdAt = CURRENT_TIMESTAMP
+                    WHERE createdAt IS NULL`);
             }
         } catch (alterError) {
             // Already exists, skip

@@ -111,24 +111,23 @@ function ResultsPage() {
 
     if (shouldHideResults) {
         return RE('div', {className: 'min-h-screen flex items-center justify-center'},
-            RE('div', {className: 'container text-center'},
-                RE(Components.Card, {},
-                    RE('div', {className: 'p-8'},
-                        RE('h2', {className: 'text-2xl font-semibold mb-4'}, sessionData.title),
-                        RE(Components.Alert, {variant: 'info'},
-                            'Results will be available after voting closes.'
+            RE('div', {className: 'container'},
+                RE('div', {className: 'card', style: {maxWidth: '500px', margin: '0 auto'}},
+                    RE('div', {className: 'card-content p-8 text-center space-y-4'},
+                        RE('h2', {className: 'text-3xl font-semibold'}, sessionData.title),
+                        RE('p', {className: 'text-lg text-red-600 font-medium'},
+                            'Results will be available automatically after voting closes.'
                         ),
-                        RE('p', {className: 'text-sm text-muted-foreground mt-4'},
+                        RE('p', {className: 'text-base text-muted-foreground'},
                             'The session creator has set results to be visible only after voting is closed.'
                         ),
-                        RE('div', {className: 'mt-6 flex items-center justify-center gap-3'},
+                        RE('div', {className: 'flex gap-6 justify-center pt-4'},
                             RE(Components.Button, {
                                 onClick: fetchResults,
                                 variant: 'outline'
                             }, 'Check Again'),
                             RE(Components.Button, {
-                                onClick: () => window.location.href = '/',
-                                variant: 'ghost'
+                                onClick: () => window.location.href = '/'
                             }, 'Back to Home')
                         )
                     )
@@ -224,39 +223,41 @@ function ResultsPage() {
                                             key: candidate.id,
                                             className: `border rounded-lg p-4 ${isWinner ? 'border-primary bg-accent' : ''}`
                                         },
-                                        RE('div', {className: 'flex items-start gap-3'},
-                                            candidate.photoUrl && RE('img', {
-                                                src: candidate.photoUrl,
-                                                alt: candidate.name,
-                                                className: 'w-16 h-16 rounded-full object-cover',
-                                                onError: (e) => {
-                                                    e.target.style.display = 'none';
-                                                }
-                                            }),
-                                            RE('div', {className: 'flex-1'},
-                                                RE('div', {className: 'flex items-center gap-2 mb-2'},
-                                                    RE('h4', {className: 'font-semibold text-lg'}, candidate.name),
-                                                    isWinner && RE(Components.Badge, {variant: 'default'}, 'Leading')
-                                                ),
-                                                candidate.description && RE('p', {className: 'text-sm text-muted-foreground mb-3'},
-                                                    candidate.description
-                                                ),
-                                                // Visual vote bar and counts
-                                                RE('div', {className: 'space-y-2'},
-                                                    RE('div', {className: 'flex items-center justify-between text-sm'},
-                                                        RE('span', {className: 'font-medium'},
-                                                            `${candidate.voteCount} vote${candidate.voteCount !== 1 ? 's' : ''}`
-                                                        ),
-                                                        RE('span', {className: 'text-muted-foreground'},
-                                                            `${percentage}%`
-                                                        )
+                                        RE('div', {className: 'flex flex-col gap-3 w-full'},
+                                            RE('div', {className: 'flex items-start gap-3'},
+                                                candidate.photoUrl && RE('img', {
+                                                    src: candidate.photoUrl,
+                                                    alt: candidate.name,
+                                                    className: 'candidate-photo-large',
+                                                    onError: (e) => {
+                                                        e.target.style.display = 'none';
+                                                    }
+                                                }),
+                                                RE('div', {className: 'flex-1 min-w-0'},
+                                                    RE('div', {className: 'flex items-center gap-2 mb-2'},
+                                                        RE('h4', {className: 'font-semibold text-lg'}, candidate.name),
+                                                        isWinner && RE(Components.Badge, {variant: 'default'}, 'Leading')
                                                     ),
-                                                    RE('div', {className: 'w-full bg-muted rounded-full h-2'},
-                                                        RE('div', {
-                                                            className: `h-full rounded-full transition-all ${isWinner ? 'bg-primary' : 'bg-secondary'}`,
-                                                            style: {width: `${percentage}%`}
-                                                        })
+                                                    candidate.description && RE('p', {className: 'text-sm text-muted-foreground'},
+                                                        candidate.description
                                                     )
+                                                )
+                                            ),
+                                            // Visual vote bar and counts
+                                            RE('div', {className: 'w-full space-y-2'},
+                                                RE('div', {className: 'flex items-center justify-between text-sm'},
+                                                    RE('span', {className: 'font-medium'},
+                                                        `${candidate.voteCount} vote${candidate.voteCount !== 1 ? 's' : ''}`
+                                                    ),
+                                                    RE('span', {className: 'text-muted-foreground'},
+                                                        `${percentage}%`
+                                                    )
+                                                ),
+                                                RE('div', {className: 'w-full bg-muted rounded-full h-2'},
+                                                    RE('div', {
+                                                        className: `h-full rounded-full transition-all ${isWinner ? 'bg-primary' : 'bg-secondary'}`,
+                                                        style: {width: `${percentage}%`}
+                                                    })
                                                 )
                                             )
                                         )

@@ -71,21 +71,27 @@ function VotingPage() {
         const currentVotes = votes[positionId] || [];
         const isSelected = currentVotes.includes(candidateId);
 
+        if (maxSelections === 1) {
+            setVotes({
+                ...votes,
+                [positionId]: [candidateId]
+            });
+            return;
+        }
+
         if (isSelected) {
             setVotes({
                 ...votes,
                 [positionId]: currentVotes.filter(id => id !== candidateId)
             });
+        } else if (currentVotes.length < maxSelections) {
+            setVotes({
+                ...votes,
+                [positionId]: [...currentVotes, candidateId]
+            });
         } else {
-            if (currentVotes.length < maxSelections) {
-                setVotes({
-                    ...votes,
-                    [positionId]: [...currentVotes, candidateId]
-                });
-            } else {
-                setError(`You can only select up to ${maxSelections} candidate(s) for this position`);
-                setTimeout(() => setError(''), 3000);
-            }
+            setError(`You can only select up to ${maxSelections} candidate(s) for this position`);
+            setTimeout(() => setError(''), 3000);
         }
     };
 
@@ -262,36 +268,35 @@ function VotingPage() {
                             RE('div', {className: 'space-y-3'},
                                 position.candidates.map(candidate => {
                                     const isSelected = (votes[position.id] || []).includes(candidate.id);
+                                    const badgeLabel = isSelected ? 'Selected' : `Choose ${position.maxSelections}`;
 
                                     return RE('div', {
                                             key: candidate.id,
-                                            className: `card cursor-pointer transition-all ${isSelected ? 'ring-2 ring-primary bg-accent' : 'hover:bg-muted/50'}`,
+                                            className: `border rounded-lg p-4 bg-white transition flex items-center gap-4 cursor-pointer ${isSelected ? 'border-primary bg-blue-50' : 'hover:bg-gray-50'}`,
                                             onClick: () => toggleCandidate(position.id, candidate.id, position.maxSelections)
                                         },
-                                        RE('div', {className: 'flex items-center gap-4'},
-                                            RE('div', {className: 'flex-shrink-0'},
-                                                RE('input', {
-                                                    type: position.maxSelections > 1 ? 'checkbox' : 'radio',
-                                                    checked: isSelected,
-                                                    onChange: () => {
-                                                    }, // Handled by card click
-                                                    className: 'w-5 h-5 cursor-pointer'
-                                                })
-                                            ),
+                                        RE('div', {className: 'flex-shrink-0'},
+                                            RE('input', {
+                                                type: position.maxSelections === 1 ? 'radio' : 'checkbox',
+                                                name: `position-${position.id}`,
+                                                checked: isSelected,
+                                                readOnly: true,
+                                                className: 'w-5 h-5 cursor-pointer'
+                                            })
+                                        ),
 
-                                            RE('div', {className: 'flex-1 min-w-0'},
-                                                RE('div', {className: 'font-semibold text-base'},
-                                                    candidate.name
-                                                ),
-                                                candidate.description && RE('p', {
-                                                    className: 'text-sm text-muted-foreground mt-1'
-                                                }, candidate.description)
-                                            ),
+                                        candidate.photoUrl && RE('img', {
+                                            src: candidate.photoUrl,
+                                            alt: candidate.name,
+                                            className: 'candidate-photo'
+                                        }),
 
-                                            isSelected && RE('div', {
-                                                    className: 'flex-shrink-0'
-                                                },
-                                                RE(Components.Badge, {variant: 'default'}, 'Selected')
+                                        RE('div', {className: 'flex-1 min-w-0'},
+                                            RE('div', null,
+                                                RE('div', {className: 'font-semibold text-base'}, candidate.name),
+                                                candidate.description && RE('p', {className: 'text-sm text-muted-foreground mt-1'},
+                                                    candidate.description
+                                                )
                                             )
                                         )
                                     );

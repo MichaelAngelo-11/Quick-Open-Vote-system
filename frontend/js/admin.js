@@ -137,6 +137,15 @@ function EmailImportModal({isOpen, onClose, onImport}) {
 function EditVoterModal({voter, onClose, onSave}) {
     const [email, setEmail] = useState(voter?.email || '');
 
+    // Update email when voter prop changes
+    useEffect(() => {
+        if (voter) {
+            setEmail(voter.email || '');
+        } else {
+            setEmail('');
+        }
+    }, [voter]);
+
     if (!voter) return null;
 
     return RE('div', {
@@ -185,6 +194,25 @@ function CandidateModal({isOpen, onClose, candidate, positions, onSave}) {
     });
 
     const isEditing = !!candidate;
+
+    // Update form data when candidate prop changes
+    useEffect(() => {
+        if (candidate) {
+            setFormData({
+                name: candidate.name || '',
+                bio: candidate.description || '',
+                imageUrl: candidate.photoUrl || '',
+                positionId: candidate.positionId || ''
+            });
+        } else {
+            setFormData({
+                name: '',
+                bio: '',
+                imageUrl: '',
+                positionId: ''
+            });
+        }
+    }, [candidate, isOpen]);
 
     const handleSubmit = () => {
         if (!formData.name.trim() || (!isEditing && !formData.positionId)) {
@@ -592,7 +620,7 @@ function AdminDashboardPage() {
                         RE('h2', {className: 'card-title'}, 'Overview')
                     ),
                     RE('div', {className: 'card-content'},
-                        RE('div', {className: 'grid grid-cols-1 md:grid-cols-4 gap-4'},
+                        RE('div', {className: 'grid grid-cols-1 md:grid-cols-2'},
                             // Turnout percentage or participant count
                             RE('div', {className: 'p-4 bg-gray-50 rounded-lg border'},
                                 RE('p', {className: 'text-sm text-gray-500 mb-1'},
@@ -628,27 +656,13 @@ function AdminDashboardPage() {
                 ),
 
                 // Tab navigation
-                RE('div', {className: 'flex border-b'},
-                    RE(Components.Button, {
-                        variant: 'ghost',
-                        onClick: () => setActiveTab('settings'),
-                        className: `border-b-2 rounded-none ${activeTab === 'settings' ? 'border-primary' : 'border-transparent'}`
-                    }, 'Settings'),
-                    RE(Components.Button, {
-                        variant: 'ghost',
-                        onClick: () => setActiveTab('candidates'),
-                        className: `border-b-2 rounded-none ${activeTab === 'candidates' ? 'border-primary' : 'border-transparent'}`
-                    }, 'Candidates'),
-                    RE(Components.Button, {
-                        variant: 'ghost',
-                        onClick: () => setActiveTab('voters'),
-                        className: `border-b-2 rounded-none ${activeTab === 'voters' ? 'border-primary' : 'border-transparent'}`
-                    }, 'Voters'),
-                    RE(Components.Button, {
-                        variant: 'ghost',
-                        onClick: () => setActiveTab('results'),
-                        className: `border-b-2 rounded-none ${activeTab === 'results' ? 'border-primary' : 'border-transparent'}`
-                    }, 'Results')
+                RE('div', {className: 'flex flex-wrap gap-3 justify-center bg-white border rounded-lg py-2 shadow-sm'},
+                    ['settings', 'candidates', 'voters', 'results'].map(key => RE(Components.Button, {
+                        key,
+                        variant: activeTab === key ? 'secondary' : 'ghost',
+                        className: 'rounded-full px-5 py-2 text-base font-medium',
+                        onClick: () => setActiveTab(key)
+                    }, key.charAt(0).toUpperCase() + key.slice(1)))
                 ),
 
                 // Settings tab - configure session and manage links
@@ -658,7 +672,6 @@ function AdminDashboardPage() {
                     RE(Components.Card, null,
                         RE('div', {className: 'p-6'},
                             RE('h2', {className: 'text-xl font-semibold mb-2'}, 'Session Information'),
-                            RE('p', {className: 'text-sm text-gray-600 mb-4'}, 'Overview of your voting session'),
                             RE('div', {className: 'grid grid-cols-1 md:grid-cols-2 gap-6'},
                                 RE('div', null,
                                     RE(Components.Label, {className: 'text-sm text-gray-500'}, 'Voting Mode'),
@@ -772,7 +785,7 @@ function AdminDashboardPage() {
 
                 // Candidates tab - add/edit/view candidates
                 activeTab === 'candidates' && RE(Components.Card, null,
-                    RE('div', {className: 'p-6'},
+                    RE('div', {className: 'p-6 space-y-6'},
                         RE('div', {className: 'flex items-center justify-between mb-4'},
                             RE('div', null,
                                 RE('h2', {className: 'text-xl font-semibold'}, 'Manage Candidates'),
@@ -785,64 +798,68 @@ function AdminDashboardPage() {
                                     setEditingCandidate(null);
                                     setCandidateModalOpen(true);
                                 }
-                            }, 'Add Candidate')
+                            }, '+ Add Candidate')
                         ),
-                        RE('div', {className: 'space-y-6'},
-                            session.positions?.map((position, posIndex) =>
-                                RE('div', {key: position.id, className: 'border rounded-lg p-4'},
-                                    RE('div', {className: 'mb-4'},
-                                        RE('h3', {className: 'text-lg font-semibold flex items-center gap-2'},
-                                            `Position ${posIndex + 1}: ${position.title}`,
-                                            position.maxSelections > 1 && RE(Components.Badge, {
-                                                variant: 'outline',
-                                                className: 'text-xs'
-                                            }, `${position.maxSelections} seats`)
-                                        ),
-                                        position.description && RE('p', {className: 'text-sm text-gray-600 mt-1'}, position.description)
-                                    ),
-                                    RE('div', {className: 'space-y-3'},
-                                        position.candidates.length === 0
-                                            ? RE('p', {className: 'text-center text-gray-500 py-4'}, 'No candidates yet')
-                                            : position.candidates.map(candidate =>
-                                                RE('div', {
-                                                        key: candidate.id,
-                                                        className: 'flex items-center gap-4 p-3 border rounded-lg bg-gray-50'
-                                                    },
+                        session.positions?.map((position, posIndex) =>
+                            RE(Components.Card, {key: position.id, className: 'space-y-3'},
+                                RE(Components.CardHeader, null,
+                                    RE('div', {className: 'flex flex-wrap items-start justify-between gap-3'},
+                                        RE('div', null,
+                                            RE('h3', {className: 'card-title flex items-center gap-2'},
+                                                `Position ${posIndex + 1}: ${position.title}`,
+                                                position.maxSelections > 1 && RE(Components.Badge, {
+                                                    variant: 'outline',
+                                                    className: 'text-xs'
+                                                }, `${position.maxSelections} seats`)
+                                            ),
+                                            position.description && RE('p', {className: 'text-sm text-gray-600 mt-1 max-w-[60ch]'}, position.description)
+                                        )
+                                    )
+                                ),
+                                RE(Components.CardContent, {className: 'space-y-4'},
+                                    (position.candidates || []).length === 0
+                                        ? RE('p', {className: 'text-center text-gray-500 py-4'}, 'No candidates yet')
+                                        : (position.candidates || []).map(candidate =>
+                                            RE('div', {
+                                                    key: candidate.id,
+                                                    className: 'flex items-center justify-between gap-4 p-4 border rounded-lg bg-gray-50'
+                                                },
+                                                RE('div', {className: 'flex items-center gap-4 flex-1 min-w-0'},
                                                     candidate.photoUrl && RE('img', {
                                                         src: candidate.photoUrl,
                                                         alt: candidate.name,
-                                                        className: 'w-12 h-12 rounded-full object-cover'
+                                                        className: 'candidate-photo'
                                                     }),
-                                                    RE('div', {className: 'flex-1'},
-                                                        RE('h4', {className: 'font-semibold'}, candidate.name),
-                                                        candidate.description && RE('p', {className: 'text-sm text-gray-600'}, candidate.description),
-                                                        RE('p', {className: 'text-xs text-gray-500 mt-1'},
+                                                    RE('div', {className: 'flex-1 min-w-0 flex flex-col gap-1.5'},
+                                                        RE('h4', {className: 'font-semibold text-base text-gray-900'}, candidate.name),
+                                                        candidate.description && RE('p', {className: 'text-xs text-gray-600 line-clamp-2'}, candidate.description),
+                                                        RE('p', {className: 'text-xs text-gray-500'},
                                                             `${candidate.voteCount || 0} vote${(candidate.voteCount || 0) !== 1 ? 's' : ''}`
                                                         )
-                                                    ),
-                                                    RE('div', {className: 'flex gap-2'},
-                                                        RE(Components.Button, {
-                                                            size: 'sm',
-                                                            variant: 'outline',
-                                                            onClick: () => {
-                                                                setEditingCandidate(candidate);
-                                                                setCandidateModalOpen(true);
-                                                            }
-                                                        }, 'Edit'),
-                                                        RE(Components.Button, {
-                                                            size: 'sm',
-                                                            variant: 'outline',
-                                                            onClick: () => handleDeleteCandidate(
-                                                                candidate.id,
-                                                                candidate.name,
-                                                                (candidate.voteCount || 0) > 0
-                                                            ),
-                                                            disabled: (candidate.voteCount || 0) > 0
-                                                        }, 'Delete')
                                                     )
+                                                ),
+                                                RE('div', {className: 'flex gap-4 flex-shrink-0'},
+                                                    RE(Components.Button, {
+                                                        size: 'sm',
+                                                        className: 'border border-black bg-white text-black hover:bg-gray-100',
+                                                        onClick: () => {
+                                                            setEditingCandidate(candidate);
+                                                            setCandidateModalOpen(true);
+                                                        }
+                                                    }, 'Edit'),
+                                                    RE(Components.Button, {
+                                                        size: 'sm',
+                                                        variant: 'destructive',
+                                                        onClick: () => handleDeleteCandidate(
+                                                            candidate.id,
+                                                            candidate.name,
+                                                            (candidate.voteCount || 0) > 0
+                                                        ),
+                                                        disabled: (candidate.voteCount || 0) > 0
+                                                    }, 'Delete')
                                                 )
                                             )
-                                    )
+                                        )
                                 )
                             )
                         )
@@ -865,7 +882,7 @@ function AdminDashboardPage() {
                             ),
                             session.mode === 'official' && RE(Components.Button, {
                                 onClick: () => setIsImportingVoters(true)
-                            }, 'Add Voters')
+                            }, '+ Add Voters')
                         ),
 
                         session.mode === 'official'
@@ -880,49 +897,49 @@ function AdminDashboardPage() {
                                 ),
 
                                 // List of voters with participation status
-                                RE('div', {className: 'space-y-2'},
+                                RE('div', {className: 'space-y-3'},
                                     filteredVoters.length === 0
-                                        ? RE('p', {className: 'text-gray-500 text-center py-8'},
+                                        ? RE('p', {className: 'text-center text-gray-500 py-8'},
                                             voterSearch ? 'No voters found matching your search' : 'No voters have been invited yet'
                                         )
                                         : filteredVoters.map(voter =>
                                             RE('div', {
                                                     key: voter.id,
-                                                    className: 'flex items-center justify-between p-3 border rounded'
+                                                    className: 'flex items-center justify-between gap-4 p-4 border rounded-lg bg-gray-50'
                                                 },
-                                                RE('div', {className: 'flex items-center gap-3'},
-                                                    RE('span', {className: 'font-medium'}, voter.email)
+                                                RE('div', {className: 'flex-1 min-w-0 flex flex-col gap-1.5'},
+                                                    RE('h4', {className: 'font-semibold text-base text-gray-900'}, voter.email),
+                                                    RE('p', {className: 'text-xs text-gray-500'},
+                                                        voter.hasVoted
+                                                            ? (() => {
+                                                                const date = new Date(voter.votedAt);
+                                                                const day = String(date.getDate()).padStart(2, '0');
+                                                                const month = String(date.getMonth() + 1).padStart(2, '0');
+                                                                const year = date.getFullYear();
+                                                                const hours = String(date.getHours()).padStart(2, '0');
+                                                                const minutes = String(date.getMinutes()).padStart(2, '0');
+                                                                const seconds = String(date.getSeconds()).padStart(2, '0');
+                                                                return `Voted: ${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
+                                                            })()
+                                                            : 'Pending'
+                                                    )
                                                 ),
-                                                RE('div', {className: 'flex items-center gap-2'},
+                                                RE('div', {className: 'flex items-center gap-2 flex-shrink-0'},
                                                     voter.hasVoted
-                                                        ? RE(React.Fragment, null,
-                                                            RE(Components.Badge, {
-                                                                variant: 'default',
-                                                                className: 'bg-green-100 text-green-800'
-                                                            }, 'Voted'),
-                                                            voter.votedAt && RE('span', {className: 'text-xs text-gray-500'},
-                                                                (() => {
-                                                                    const date = new Date(voter.votedAt);
-                                                                    const day = String(date.getDate()).padStart(2, '0');
-                                                                    const month = String(date.getMonth() + 1).padStart(2, '0');
-                                                                    const year = date.getFullYear();
-                                                                    const hours = String(date.getHours()).padStart(2, '0');
-                                                                    const minutes = String(date.getMinutes()).padStart(2, '0');
-                                                                    const seconds = String(date.getSeconds()).padStart(2, '0');
-                                                                    return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
-                                                                })()
-                                                            )
-                                                        )
+                                                        ? RE(Components.Badge, {
+                                                            variant: 'default',
+                                                            className: 'bg-green-100 text-green-800'
+                                                        }, 'Voted')
                                                         : RE(React.Fragment, null,
                                                             RE(Components.Badge, {variant: 'secondary'}, 'Pending'),
                                                             RE(Components.Button, {
                                                                 size: 'sm',
-                                                                variant: 'ghost',
+                                                                variant: 'outline',
                                                                 onClick: () => setEditingVoter(voter)
                                                             }, 'Edit'),
                                                             RE(Components.Button, {
                                                                 size: 'sm',
-                                                                variant: 'ghost',
+                                                                variant: 'destructive',
                                                                 onClick: () => handleDeleteVoter(voter.id, voter.email, voter.hasVoted)
                                                             }, 'Delete')
                                                         )
@@ -995,38 +1012,51 @@ function AdminDashboardPage() {
                                                 const isTied = sortedCandidates.filter(c =>
                                                     (c.voteCount || 0) === (candidate.voteCount || 0) && (candidate.voteCount || 0) > 0
                                                 ).length > 1;
+                                                const isLeading = actualRank === 1 && (candidate.voteCount || 0) > 0 && !isTied;
 
                                                 return RE('div', {
                                                         key: candidate.id,
-                                                        className: 'flex items-center gap-4 p-3 border rounded-lg bg-gray-50'
+                                                        className: 'flex items-center justify-between gap-4 p-4 border rounded-lg bg-gray-50'
                                                     },
-                                                    RE('div', {className: 'text-xl font-bold text-gray-400 w-8'},
-                                                        `#${actualRank}`
+                                                    RE('div', {className: 'flex-1 min-w-0 flex flex-col gap-3 w-full'},
+                                                        RE('div', {className: 'flex items-start gap-4 w-full'},
+                                                            candidate.photoUrl && RE('img', {
+                                                                src: candidate.photoUrl,
+                                                                alt: candidate.name,
+                                                                className: 'candidate-photo'
+                                                            }),
+                                                            RE('div', {className: 'flex-1 min-w-0'},
+                                                                RE('h4', {className: 'font-semibold text-base text-gray-900'}, candidate.name),
+                                                                candidate.description && RE('p', {
+                                                                    className: 'text-xs text-gray-600 line-clamp-2'
+                                                                }, candidate.description)
+                                                            )
+                                                        ),
+                                                        RE('div', {className: 'w-full space-y-1.5'},
+                                                            RE('div', {className: 'flex items-center justify-between text-xs'},
+                                                                RE('span', {className: 'font-medium text-gray-700'},
+                                                                    `${candidate.voteCount || 0} vote${(candidate.voteCount || 0) !== 1 ? 's' : ''}`
+                                                                ),
+                                                                RE('span', {className: 'text-gray-500'},
+                                                                    `${percentage.toFixed(1)}%`
+                                                                )
+                                                            ),
+                                                            RE('div', {className: 'w-full bg-muted rounded-full h-1.5'},
+                                                                RE('div', {
+                                                                    className: `h-full rounded-full transition-all ${isLeading ? 'bg-primary' : 'bg-secondary'}`,
+                                                                    style: {width: `${percentage}%`}
+                                                                })
+                                                            )
+                                                        )
                                                     ),
-                                                    candidate.photoUrl && RE('img', {
-                                                        src: candidate.photoUrl,
-                                                        alt: candidate.name,
-                                                        className: 'w-12 h-12 rounded-full object-cover'
-                                                    }),
-                                                    RE('div', {className: 'flex-1'},
-                                                        RE('div', {className: 'flex items-center gap-2 mb-1 flex-wrap'},
-                                                            RE('h4', {className: 'font-semibold'}, candidate.name),
+                                                    RE('div', {className: 'flex items-center gap-3 flex-shrink-0'},
+                                                        RE('div', {className: 'text-right'},
+                                                            RE('div', {className: 'text-lg font-bold text-gray-900'}, `#${actualRank}`),
                                                             isTied && RE(Components.Badge, {
                                                                 variant: 'default',
                                                                 className: 'bg-blue-100 text-blue-800 text-xs'
                                                             }, 'Tied')
-                                                        ),
-                                                        candidate.description && RE('p', {className: 'text-sm text-gray-600 line-clamp-1'}, candidate.description),
-                                                        RE('div', {className: 'mt-2 results-progress'},
-                                                            RE('div', {
-                                                                className: 'results-progress-fill',
-                                                                style: {width: `${percentage}%`}
-                                                            })
                                                         )
-                                                    ),
-                                                    RE('div', {className: 'text-right'},
-                                                        RE('div', {className: 'text-2xl font-bold'}, candidate.voteCount || 0),
-                                                        RE('div', {className: 'text-sm text-gray-500'}, `${percentage.toFixed(1)}%`)
                                                     )
                                                 );
                                             })

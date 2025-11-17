@@ -75,6 +75,7 @@ function Input({
                    value,
                    onChange,
                    disabled = false,
+                   readOnly = false,
                    className = '',
                    id = ''
                }) {
@@ -84,8 +85,9 @@ function Input({
         value,
         onChange,
         disabled,
+        readOnly,
         className: `input ${className}`,
-        id,
+        ...(id ? {id} : {}),
     });
 }
 
@@ -98,6 +100,7 @@ function Textarea({
                       onChange,
                       rows = 4,
                       disabled = false,
+                      readOnly = false,
                       className = '',
                       id = ''
                   }) {
@@ -107,8 +110,9 @@ function Textarea({
         onChange,
         rows,
         disabled,
+        readOnly,
         className: `textarea ${className}`,
-        id,
+        ...(id ? {id} : {}),
     });
 }
 
@@ -117,7 +121,7 @@ function Textarea({
  */
 function Label({children, htmlFor = '', className = ''}) {
     return h('label', {
-        htmlFor,
+        ...(htmlFor ? {htmlFor} : {}),
         className: `label ${className}`,
     }, children);
 }

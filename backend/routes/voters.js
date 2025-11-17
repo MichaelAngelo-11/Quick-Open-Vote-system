@@ -61,12 +61,14 @@ router.post('/', (req, res) => {
         });
 
         const insertVoter = db.getDb().prepare(`
-            INSERT INTO InvitedVoter (id, sessionId, email, hasVoted, votedAt)
-            VALUES (?, ?, ?, 0, NULL)
+            INSERT INTO InvitedVoter (id, sessionId, email, hasVoted, votedAt, createdAt)
+            VALUES (?, ?, ?, 0, NULL, ?)
         `);
 
+        const timestamp = db.getCurrentTimestamp();
+
         validEmails.forEach(email => {
-            insertVoter.run(db.generateId(), sessionId, email);
+            insertVoter.run(db.generateId(), sessionId, email, timestamp);
         });
 
         db.getDb().prepare(`
@@ -88,8 +90,8 @@ router.post('/', (req, res) => {
         });
 
     } catch (error) {
-        console.error('Error adding voters:', error);
-        res.status(500).json({error: 'Failed to add voters'});
+        console.error('Error adding voters:', error.message, error);
+        res.status(500).json({error: 'Failed to add voters', details: error.message});
     }
 });
 
