@@ -40,13 +40,13 @@ function HomePage() {
                     RE(Components.Button, {
                         onClick: handleCreate,
                         className: 'btn btn-primary btn-lg',
-                        style: {width: 'fit-content'}
+                        style: {width: '250px'}
                     }, 'Create Voting Session'),
 
                     RE(Components.Button, {
                         onClick: () => setShowJoinDialog(true),
                         className: 'btn btn-outline btn-lg',
-                        style: {width: 'fit-content'}
+                        style: {width: '250px'}
                     }, 'Join Voting Session')
                 ),
 
@@ -76,21 +76,23 @@ function HomePage() {
         ),
 
         // Modal dialog for joining a session
-        showJoinDialog && RE('div', {},
-            RE('div', {
-                className: 'dialog-overlay',
+        showJoinDialog && RE('div', {
+                className: 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50',
                 onClick: () => setShowJoinDialog(false)
-            }),
-            RE('div', {className: 'dialog-content'},
-                RE('div', {className: 'dialog-header'},
-                    RE('h2', {className: 'dialog-title'}, 'Join Voting Session'),
-                    RE('p', {className: 'dialog-description'},
+            },
+            RE('div', {
+                    className: 'bg-white rounded-lg p-6 max-w-md w-full mx-4 shadow-lg modal-content',
+                    onClick: (e) => e.stopPropagation()
+                },
+                RE('div', {className: 'mb-4'},
+                    RE('h2', {className: 'text-xl font-bold'}, 'Join Voting Session'),
+                    RE('p', {className: 'text-sm text-muted-foreground mt-1'},
                         'Enter the session code to participate'
                     )
                 ),
-                RE('div', {className: 'dialog-body'},
-                    RE(FormGroup, {label: 'Session Code'},
-                        RE(Input, {
+                RE('div', {className: 'mb-6'},
+                    RE(Components.FormGroup, {label: 'Session Code'},
+                        RE(Components.Input, {
                             type: 'text',
                             placeholder: 'Enter code...',
                             value: joinCode,
@@ -100,14 +102,13 @@ function HomePage() {
                         })
                     )
                 ),
-                RE('div', {className: 'dialog-footer'},
+                RE('div', {className: 'flex justify-end gap-2'},
                     RE(Components.Button, {
                         onClick: () => setShowJoinDialog(false),
-                        className: 'btn btn-outline'
+                        variant: 'outline'
                     }, 'Cancel'),
                     RE(Components.Button, {
                         onClick: handleJoin,
-                        className: 'btn btn-primary',
                         disabled: !joinCode.trim()
                     }, 'Join Session')
                 )

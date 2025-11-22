@@ -111,7 +111,7 @@ function Textarea({
         rows,
         disabled,
         readOnly,
-        className: `textarea ${className}`,
+        className: `input ${className}`,
         ...(id ? {id} : {}),
     });
 }
@@ -162,37 +162,6 @@ function Alert({children, variant = 'info', className = ''}) {
 }
 
 /**
- * Dialog - Modal popup that closes on overlay click
- */
-function Dialog({
-                    isOpen,
-                    onClose,
-                    title,
-                    description,
-                    children
-                }) {
-    if (!isOpen) return null;
-
-    return h('div', {
-            className: 'dialog-overlay',
-            onClick: (e) => {
-                // Only close if clicking the overlay, not the dialog itself
-                if (e.target.className === 'dialog-overlay') {
-                    onClose();
-                }
-            }
-        },
-        h(Card, {className: 'dialog'},
-            title && h('div', {className: 'dialog-header'},
-                h('h2', {className: 'dialog-title'}, title),
-                description && h('p', {className: 'dialog-description'}, description)
-            ),
-            children
-        )
-    );
-}
-
-/**
  * FormGroup - Pairs a label with an input field
  */
 function FormGroup({label, children, htmlFor = ''}) {
@@ -218,6 +187,5 @@ window.Components = {
     Spinner,
     Loading,
     Alert,
-    Dialog,
     FormGroup,
 };

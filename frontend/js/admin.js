@@ -822,7 +822,7 @@ function AdminDashboardPage() {
                                         : (position.candidates || []).map(candidate =>
                                             RE('div', {
                                                     key: candidate.id,
-                                                    className: 'flex items-center justify-between gap-4 p-4 border rounded-lg bg-gray-50'
+                                                    className: 'flex items-center justify-between gap-4 p-4 border rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors'
                                                 },
                                                 RE('div', {className: 'flex items-center gap-4 flex-1 min-w-0'},
                                                     candidate.photoUrl && RE('img', {
@@ -905,7 +905,7 @@ function AdminDashboardPage() {
                                         : filteredVoters.map(voter =>
                                             RE('div', {
                                                     key: voter.id,
-                                                    className: 'flex items-center justify-between gap-4 p-4 border rounded-lg bg-gray-50'
+                                                    className: 'flex items-center justify-between gap-4 p-4 border rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors'
                                                 },
                                                 RE('div', {className: 'flex-1 min-w-0 flex flex-col gap-1.5'},
                                                     RE('h4', {className: 'font-semibold text-base text-gray-900'}, voter.email),

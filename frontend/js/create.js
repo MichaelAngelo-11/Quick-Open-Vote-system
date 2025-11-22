@@ -275,14 +275,15 @@ function CreateSessionPage() {
                             RE('div', {className: 'grid md:grid-cols-2 gap-4'},
                                 // Anyone can vote with a code
                                 RE('div', {
-                                        className: `radio-item ${sessionData.mode === 'casual' ? 'selected' : ''}`,
+                                        className: `flex items-start gap-3 p-4 border rounded-lg cursor-pointer transition-all ${sessionData.mode === 'casual' ? 'border-primary bg-secondary' : 'border-border hover:border-primary'}`,
                                         onClick: () => setSessionData({...sessionData, mode: 'casual'})
                                     },
                                     RE('input', {
                                         type: 'radio',
                                         name: 'mode',
                                         checked: sessionData.mode === 'casual',
-                                        onChange: () => setSessionData({...sessionData, mode: 'casual'})
+                                        onChange: () => setSessionData({...sessionData, mode: 'casual'}),
+                                        className: 'mt-1'
                                     }),
                                     RE('div', {},
                                         RE('div', {className: 'font-semibold flex items-center gap-2'},
@@ -297,14 +298,15 @@ function CreateSessionPage() {
 
                                 // Only invited voters
                                 RE('div', {
-                                        className: `radio-item ${sessionData.mode === 'official' ? 'selected' : ''}`,
+                                        className: `flex items-start gap-3 p-4 border rounded-lg cursor-pointer transition-all ${sessionData.mode === 'official' ? 'border-primary bg-secondary' : 'border-border hover:border-primary'}`,
                                         onClick: () => setSessionData({...sessionData, mode: 'official'})
                                     },
                                     RE('input', {
                                         type: 'radio',
                                         name: 'mode',
                                         checked: sessionData.mode === 'official',
-                                        onChange: () => setSessionData({...sessionData, mode: 'official'})
+                                        onChange: () => setSessionData({...sessionData, mode: 'official'}),
+                                        className: 'mt-1'
                                     }),
                                     RE('div', {},
                                         RE('div', {className: 'font-semibold flex items-center gap-2'},
@@ -324,14 +326,15 @@ function CreateSessionPage() {
                             RE('div', {className: 'grid md:grid-cols-2 gap-4'},
                                 // Show votes as they come in
                                 RE('div', {
-                                        className: `radio-item ${sessionData.resultDisplay === 'realtime' ? 'selected' : ''}`,
+                                        className: `flex items-start gap-3 p-4 border rounded-lg cursor-pointer transition-all ${sessionData.resultDisplay === 'realtime' ? 'border-primary bg-secondary' : 'border-border hover:border-primary'}`,
                                         onClick: () => setSessionData({...sessionData, resultDisplay: 'realtime'})
                                     },
                                     RE('input', {
                                         type: 'radio',
                                         name: 'resultDisplay',
                                         checked: sessionData.resultDisplay === 'realtime',
-                                        onChange: () => setSessionData({...sessionData, resultDisplay: 'realtime'})
+                                        onChange: () => setSessionData({...sessionData, resultDisplay: 'realtime'}),
+                                        className: 'mt-1'
                                     }),
                                     RE('div', {},
                                         RE('div', {className: 'font-semibold'}, 'Real-time Results'),
@@ -343,14 +346,15 @@ function CreateSessionPage() {
 
                                 // Hide until session closes
                                 RE('div', {
-                                        className: `radio-item ${sessionData.resultDisplay === 'after-closes' ? 'selected' : ''}`,
+                                        className: `flex items-start gap-3 p-4 border rounded-lg cursor-pointer transition-all ${sessionData.resultDisplay === 'after-closes' ? 'border-primary bg-secondary' : 'border-border hover:border-primary'}`,
                                         onClick: () => setSessionData({...sessionData, resultDisplay: 'after-closes'})
                                     },
                                     RE('input', {
                                         type: 'radio',
                                         name: 'resultDisplay',
                                         checked: sessionData.resultDisplay === 'after-closes',
-                                        onChange: () => setSessionData({...sessionData, resultDisplay: 'after-closes'})
+                                        onChange: () => setSessionData({...sessionData, resultDisplay: 'after-closes'}),
+                                        className: 'mt-1'
                                     }),
                                     RE('div', {},
                                         RE('div', {className: 'font-semibold'}, 'After Voting Closes'),
@@ -418,14 +422,15 @@ function CreateSessionPage() {
                                 ),
                                 RE('div', {className: 'flex flex-wrap gap-2'},
                                     sessionData.invitedEmails.map(email =>
-                                        RE('span', {
+                                        RE(Components.Badge, {
                                                 key: email,
-                                                className: 'tag'
+                                                variant: 'secondary',
+                                                className: 'flex items-center gap-2'
                                             },
                                             email,
                                             RE('button', {
                                                 onClick: () => removeEmail(email),
-                                                className: 'tag-remove'
+                                                className: 'hover:text-destructive ml-1'
                                             }, '×')
                                         )
                                     )
@@ -446,12 +451,12 @@ function CreateSessionPage() {
                     RE('div', {className: 'card-content space-y-6'},
                         // Render each position
                         sessionData.positions.map((position, positionIndex) =>
-                            RE('div', {
+                            RE(Components.Card, {
                                     key: position.id,
-                                    className: 'panel'
+                                    className: 'mb-4'
                                 },
                                 // Position title and delete button
-                                RE('div', {className: 'panel-header flex justify-between items-start'},
+                                RE(Components.CardHeader, {className: 'flex flex-row justify-between items-start bg-muted p-4'},
                                     RE('h4', {className: 'font-semibold text-lg'},
                                         `Position ${positionIndex + 1}`
                                     ),
@@ -462,7 +467,7 @@ function CreateSessionPage() {
                                     }, 'Remove Position')
                                 ),
 
-                                RE('div', {className: 'panel-content space-y-4'},
+                                RE(Components.CardContent, {className: 'space-y-4 p-4'},
                                     // Position name and number of seats
                                     RE('div', {className: 'grid md:grid-cols-3 gap-3'},
                                         RE('div', {className: 'space-y-2'},
@@ -508,9 +513,9 @@ function CreateSessionPage() {
 
                                         // List of candidates
                                         position.candidates.map((candidate, candidateIndex) =>
-                                            RE('div', {
+                                            RE(Components.Card, {
                                                     key: candidate.id,
-                                                    className: 'card candidate-card space-y-3'
+                                                    className: 'p-4 space-y-3'
                                                 },
                                                 RE('div', {className: 'flex justify-between items-start'},
                                                     RE('h5', {className: 'font-medium'},
