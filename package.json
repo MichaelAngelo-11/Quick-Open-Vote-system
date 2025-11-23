@@ -2,6 +2,7 @@
   "name": "quick-open-vote-system",
   "type": "module",
   "scripts": {
+    "start": "node backend/server.js",
     "dev": "node backend/server.js"
   },
   "dependencies": {
