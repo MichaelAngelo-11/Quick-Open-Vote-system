@@ -1,6 +1,6 @@
 # Quick-Open Vote System - Democratic Voting Made Simple
 
-A production-ready voting system with official (email-based) and casual (code-based) voting modes. Features real-time results, duplicate vote prevention, and a comprehensive admin dashboard.
+A production-ready voting system with official (email-based) and casual voting modes. Features real-time results, duplicate vote prevention, and a comprehensive admin dashboard.
 
 ---
 
